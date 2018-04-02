@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -45,7 +46,7 @@ public class RegistrationApi {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/activate/code")
+    @RequestMapping(method = RequestMethod.POST, value = "/activation/code")
     public ResponseEntity activationCode(@RequestBody  ActivationCodeRequest activationCodeRequest){
         try{
             activationService.generateActivationCode(
@@ -58,10 +59,10 @@ public class RegistrationApi {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/reactivate")
-    public ResponseEntity doReactivate(@RequestBody UserActivationResponse oldToken){
+    @RequestMapping(method = RequestMethod.GET, value = "/reactivate")
+    public ResponseEntity doReactivate(@RequestHeader("auth") String oldToken){
         try {
-            UserActivationResponse userActivationResponse = activationService.getNewToken(oldToken.getToken());
+            UserActivationResponse userActivationResponse = activationService.getNewToken(oldToken);
             return ResponseEntity.status(HttpStatus.OK).body(userActivationResponse);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
