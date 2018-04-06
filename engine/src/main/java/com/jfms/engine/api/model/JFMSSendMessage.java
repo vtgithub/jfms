@@ -1,9 +1,10 @@
-package com.jfms.engine.service;
+package com.jfms.engine.api.model;
 
 /**
  * Created by vahid on 4/3/18.
  */
 public class JFMSSendMessage {
+    private Integer method;
     private String from;
     private String to;
     private String body;
@@ -39,5 +40,13 @@ public class JFMSSendMessage {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public Integer getMethod() {
+        return method;
+    }
+
+    public void setMethod(Integer method) {
+        this.method = method;
     }
 }

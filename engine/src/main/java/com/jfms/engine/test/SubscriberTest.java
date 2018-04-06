@@ -15,7 +15,7 @@ public class SubscriberTest {
                 System.out.println(message);
                 System.out.println(channel);
             }
-        }, "x*");
+        }, "*");
 
     }
 }

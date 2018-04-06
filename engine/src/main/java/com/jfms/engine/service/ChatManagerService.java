@@ -1,6 +1,9 @@
 package com.jfms.engine.service;
 
 import com.google.gson.Gson;
+import com.jfms.engine.api.model.JFMSLoginMessage;
+import com.jfms.engine.api.model.JFMSSendMessage;
+import com.jfms.engine.api.Method;
 import com.jfms.engine.service.biz.ChatManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,15 +23,20 @@ public class ChatManagerService {
         System.out.println(message.getPayload());
 
         String messageInJson = message.getPayload();
-//        int methodNo = fetchMethod(messageInJson);
-//        if(methodNo == Method.INIT.getValue()) {
-//            NakaLoginMessage nakaLoginMessage = new Gson().fromJson(messageInJson, NakaLoginMessage.class);
-//            chatManager.init(nakaLoginMessage , session);
-//        } else if(methodNo == Method.SEND.getValue()) {
+        int methodNo = fetchMethod(messageInJson);
+        if(methodNo == Method.INIT.getValue()) {
+            JFMSLoginMessage jfmsLoginMessage= new Gson().fromJson(messageInJson, JFMSLoginMessage.class);
+            chatManager.init(jfmsLoginMessage , session);
+        } else if(methodNo == Method.SEND.getValue()) {
             JFMSSendMessage jfmsSendMessage = new Gson().fromJson(messageInJson, JFMSSendMessage.class);
             chatManager.sendMessage(jfmsSendMessage);
-//        }
+        }
     }
+
+    public void closeUserSession(String sessionId){
+        chatManager.removeUserSession(sessionId);
+    }
+
 //    //----------------------------------
 
     private int fetchMethod(String messageInJson) throws MethodIsNullException{
