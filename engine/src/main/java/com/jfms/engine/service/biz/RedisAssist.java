@@ -29,34 +29,39 @@ public class RedisAssist implements InitializingBean {
     UserSessionRepository userSessionRepository;
     @Autowired
     RedisConverter redisConverter;
-
+//
     private Jedis publisher;
     private Jedis subscriber;
-
+//
     public void sendMessage( String channel, String message) {
         publisher.publish(channel , message);
     }
-
-
+//
+//
     @Override
     public void afterPropertiesSet() throws Exception {
         publisher = new Jedis("localhost", 6379);
         subscriber = new Jedis("localhost", 6379);
         Gson gson = new Gson();
-        subscriber.psubscribe(new JedisPubSub() {
+        (new Thread(new Runnable() {
             @Override
-            public void onPMessage(String pattern, String channel, String message) {
-                RedisChannelEntity redisChannelEntity = gson.fromJson(message, RedisChannelEntity.class);
-                WebSocketSession session = userSessionRepository.getSession(redisChannelEntity.getTo());
-                JFMSReceiveMessage jfmsReceiveMessage = redisConverter.getJFMSReceiveMessage(redisChannelEntity);
-                try {
-                    session.sendMessage(new TextMessage(gson.toJson(jfmsReceiveMessage)));
-                } catch (IOException e) {
-                    //todo log
-                    e.printStackTrace();
-                }
+            public void run() {
+                subscriber.psubscribe(new JedisPubSub() {
+                    @Override
+                    public void onPMessage(String pattern, String channel, String message) {
+                    RedisChannelEntity redisChannelEntity = gson.fromJson(message, RedisChannelEntity.class);
+                    WebSocketSession session = userSessionRepository.getSession(redisChannelEntity.getTo());
+                    JFMSReceiveMessage jfmsReceiveMessage = redisConverter.getJFMSReceiveMessage(redisChannelEntity);
+                    try {
+                        session.sendMessage(new TextMessage(gson.toJson(jfmsReceiveMessage)));
+                    } catch (IOException e) {
+                        //todo log
+                        e.printStackTrace();
+                    }
+                        }
+                    }, "*");
             }
-        }, "*");
+        })).start();
 
     }
 
