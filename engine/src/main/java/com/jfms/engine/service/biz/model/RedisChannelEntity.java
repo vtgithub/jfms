@@ -11,13 +11,15 @@ public class RedisChannelEntity {
     private String to;
     private String message;
     private String subject;
+    private Long sendTime;
 
 
-    public RedisChannelEntity(String from, String to, String message, String subject) {
+    public RedisChannelEntity(String from, String to, String message, String subject, Long sendTime) {
         this.from = from;
         this.to = to;
         this.message = message;
         this.subject = subject;
+        this.sendTime = sendTime;
     }
 
     public RedisChannelEntity() {
@@ -61,5 +63,13 @@ public class RedisChannelEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Long getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Long sendTime) {
+        this.sendTime = sendTime;
     }
 }

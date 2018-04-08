@@ -1,20 +1,17 @@
 package com.jfms.engine.service.biz;
 
 import com.google.gson.Gson;
-import com.jfms.engine.api.model.JFMSReceiveMessage;
+import com.jfms.engine.api.model.JFMSServerSendMessage;
 import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.model.RedisChannelEntity;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 /**
@@ -51,9 +48,9 @@ public class RedisAssist implements InitializingBean {
                     public void onPMessage(String pattern, String channel, String message) {
                     RedisChannelEntity redisChannelEntity = gson.fromJson(message, RedisChannelEntity.class);
                     WebSocketSession session = userSessionRepository.getSession(redisChannelEntity.getTo());
-                    JFMSReceiveMessage jfmsReceiveMessage = redisConverter.getJFMSReceiveMessage(redisChannelEntity);
+                    JFMSServerSendMessage jfmsServerSendMessage = redisConverter.getJFMSReceiveMessage(redisChannelEntity);
                     try {
-                        session.sendMessage(new TextMessage(gson.toJson(jfmsReceiveMessage)));
+                        session.sendMessage(new TextMessage(gson.toJson(jfmsServerSendMessage)));
                     } catch (IOException e) {
                         //todo log
                         e.printStackTrace();

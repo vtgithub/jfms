@@ -5,21 +5,23 @@ import java.util.UUID;
 /**
  * Created by vahid on 4/4/18.
  */
-public class JFMSReceiveMessage {
+public class JFMSServerSendMessage {
     private String id;
     private String from;
     private String body;
     private String subject;
+    private Long sendTime;
 
 
-    public JFMSReceiveMessage(String id, String from, String body, String subject) {
+    public JFMSServerSendMessage(String id, String from, String body, String subject, Long sendTime) {
         this.id = id;
         this.from = from;
         this.body = body;
         this.subject = subject;
+        this.sendTime = sendTime;
     }
 
-    public JFMSReceiveMessage() {
+    public JFMSServerSendMessage() {
     }
 
     public String getFrom() {
@@ -53,4 +55,14 @@ public class JFMSReceiveMessage {
     public void setId(String id) {
         this.id = id;
     }
+
+    public Long getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Long sendTime) {
+        this.sendTime = sendTime;
+    }
+
+
 }

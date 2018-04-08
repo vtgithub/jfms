@@ -3,7 +3,7 @@ package com.jfms.engine.api.model;
 /**
  * Created by vahid on 4/4/18.
  */
-public class JFMSLoginMessage {
+public class JFMSClientLoginMessage {
     private Integer method;
     private String userName;
 

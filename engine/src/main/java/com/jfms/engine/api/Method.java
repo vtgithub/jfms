@@ -3,7 +3,8 @@ package com.jfms.engine.api;
 public enum Method {
     INIT(1),
     SEND(2),
-    PING(3);
+    EDIT(3),
+    PING(4);
 
     private int value;
 

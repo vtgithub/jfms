@@ -1,8 +1,9 @@
 package com.jfms.engine.service;
 
 import com.google.gson.Gson;
-import com.jfms.engine.api.model.JFMSLoginMessage;
-import com.jfms.engine.api.model.JFMSSendMessage;
+import com.jfms.engine.api.model.JFMSClientEditMessage;
+import com.jfms.engine.api.model.JFMSClientLoginMessage;
+import com.jfms.engine.api.model.JFMSClientSendMessage;
 import com.jfms.engine.api.Method;
 import com.jfms.engine.service.biz.ChatManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,14 @@ public class ChatManagerService {
         String messageInJson = message.getPayload();
         int methodNo = fetchMethod(messageInJson);
         if(methodNo == Method.INIT.getValue()) {
-            JFMSLoginMessage jfmsLoginMessage= new Gson().fromJson(messageInJson, JFMSLoginMessage.class);
-            chatManager.init(jfmsLoginMessage , session);
+            JFMSClientLoginMessage jfmsClientLoginMessage = new Gson().fromJson(messageInJson, JFMSClientLoginMessage.class);
+            chatManager.init(jfmsClientLoginMessage, session);
         } else if(methodNo == Method.SEND.getValue()) {
-            JFMSSendMessage jfmsSendMessage = new Gson().fromJson(messageInJson, JFMSSendMessage.class);
-            chatManager.sendMessage(jfmsSendMessage);
+            JFMSClientSendMessage jfmsClientSendMessage = new Gson().fromJson(messageInJson, JFMSClientSendMessage.class);
+            chatManager.sendMessage(jfmsClientSendMessage);
+        } else if (methodNo == Method.EDIT.getValue()){
+            JFMSClientEditMessage jfmsClientEditMessage = new Gson().fromJson(messageInJson, JFMSClientEditMessage.class);
+            chatManager.editMessage(jfmsClientEditMessage);
         }
     }
 
