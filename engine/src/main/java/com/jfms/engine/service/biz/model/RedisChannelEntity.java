@@ -1,9 +1,12 @@
 package com.jfms.engine.service.biz.model;
 
+import java.util.UUID;
+
 /**
  * Created by vahid on 4/4/18.
  */
 public class RedisChannelEntity {
+    private String id = UUID.randomUUID().toString();
     private String from;
     private String to;
     private String message;
@@ -50,5 +53,13 @@ public class RedisChannelEntity {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

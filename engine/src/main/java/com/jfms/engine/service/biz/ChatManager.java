@@ -22,6 +22,7 @@ public class ChatManager {
     UserSessionRepository userSessionRepository;
 
     public void sendMessage(JFMSSendMessage jfmsSendMessage) {
+
         String redisChannelEntityJson = (new Gson()).toJson(redisConverter.getRedisChannelEntity(jfmsSendMessage));
         redisAssist.sendMessage(
                 getChannelName(jfmsSendMessage.getFrom() , jfmsSendMessage.getTo()),

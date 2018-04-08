@@ -27,6 +27,7 @@ public class RedisConverter {
         if (redisChannelEntity == null)
             return null;
         JFMSReceiveMessage jfmsReceiveMessage = new JFMSReceiveMessage(
+                redisChannelEntity.getId(),
                 redisChannelEntity.getFrom(),
                 redisChannelEntity.getMessage(),
                 redisChannelEntity.getSubject()
