@@ -16,5 +16,6 @@ websocket port number is `4042`.
 
 | body | response | description |
 | --- | --- | --- |
-| {`method`, `userName`} | --- | `JFMSLoginMessage` is sending to engine. The Session is adding to the `userSessionMap`.|
-| {`method`, `from`, `to`, `body`, `subject`} | --- | `JFMSSendMessage` is sending to engine. `RedisChannelEntity` or {`from`, `to`, `message`, `subject`} is creating from `JFMSSendMessage` and is adding to redis channel by name [`max(from , to)`+`min(from, to))`] and listener get it from channel, get session by `to` field from `userSessionMap` and send `JFMSRecieveMessage` or {`from`, `body`, `subject`} to the `to` userName.|
+| {`method`, `userName`} | --- | `JFMSClientLoginMessage` is sending to engine. The Session is adding to the `userSessionMap`.|
+| {`method`, `from`, `to`, `body`, `subject`, `sendTime`} | --- | `JFMSClientSendMessage` is sending to engine. `RedisChannelEntity` or {`id`, `from`, `to`, `message`, `subject`, `sendTime`} is creating from `JFMSClientSendMessage` and is adding to redis channel by name [`max(from , to)`+`min(from, to))`] and listener get it from channel, get session by `to` field from `userSessionMap` and send `JFMSServerSendMessage` or {`id`, `from`, `body`, `subject`, `sendTime`} to the `to` userName.|
+| {`method`, `from`, `to`, `body`, `subject`, `editTime`, `id`} | --- | `JFMSClientEditMessage` is sending to engine. message history is updating previouse value of message by the `id`, convert it to `JFMSServerEditMessage` and send it to the `to` fileld |
