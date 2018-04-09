@@ -4,7 +4,8 @@ public enum Method {
     INIT(1),
     SEND(2),
     EDIT(3),
-    PING(4);
+    DELETE(4),
+    PING(5);
 
     private int value;
 

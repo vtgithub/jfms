@@ -1,6 +1,7 @@
 package com.jfms.engine.service;
 
 import com.google.gson.Gson;
+import com.jfms.engine.api.model.JFMSClientDeleteMessage;
 import com.jfms.engine.api.model.JFMSClientEditMessage;
 import com.jfms.engine.api.model.JFMSClientLoginMessage;
 import com.jfms.engine.api.model.JFMSClientSendMessage;
@@ -18,7 +19,8 @@ public class ChatManagerService {
 
     private @Autowired
     ChatManager chatManager;
-
+    private
+    Gson gson = new Gson();
     public void processMessage(TextMessage message , WebSocketSession session) throws MethodIsNullException {
 
         System.out.println(message.getPayload());
@@ -26,14 +28,17 @@ public class ChatManagerService {
         String messageInJson = message.getPayload();
         int methodNo = fetchMethod(messageInJson);
         if(methodNo == Method.INIT.getValue()) {
-            JFMSClientLoginMessage jfmsClientLoginMessage = new Gson().fromJson(messageInJson, JFMSClientLoginMessage.class);
+            JFMSClientLoginMessage jfmsClientLoginMessage = gson.fromJson(messageInJson, JFMSClientLoginMessage.class);
             chatManager.init(jfmsClientLoginMessage, session);
         } else if(methodNo == Method.SEND.getValue()) {
-            JFMSClientSendMessage jfmsClientSendMessage = new Gson().fromJson(messageInJson, JFMSClientSendMessage.class);
-            chatManager.sendMessage(jfmsClientSendMessage);
+            JFMSClientSendMessage jfmsClientSendMessage = gson.fromJson(messageInJson, JFMSClientSendMessage.class);
+            chatManager.sendMessage(jfmsClientSendMessage, session);
         } else if (methodNo == Method.EDIT.getValue()){
-            JFMSClientEditMessage jfmsClientEditMessage = new Gson().fromJson(messageInJson, JFMSClientEditMessage.class);
+            JFMSClientEditMessage jfmsClientEditMessage = gson.fromJson(messageInJson, JFMSClientEditMessage.class);
             chatManager.editMessage(jfmsClientEditMessage);
+        } else if (methodNo == Method.DELETE.getValue()){
+            JFMSClientDeleteMessage jfmsClientDeleteMessage = gson.fromJson(messageInJson, JFMSClientDeleteMessage.class);
+            chatManager.deleteMessage(jfmsClientDeleteMessage, session);
         }
     }
 

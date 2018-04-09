@@ -1,11 +1,9 @@
 package com.jfms.engine.service.biz;
 
 import com.google.gson.Gson;
-import com.jfms.engine.api.model.JFMSClientEditMessage;
-import com.jfms.engine.api.model.JFMSClientLoginMessage;
-import com.jfms.engine.api.model.JFMSClientSendMessage;
-import com.jfms.engine.api.model.JFMSServerEditMessage;
+import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
+import com.jfms.engine.service.biz.model.RedisChannelEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -30,13 +28,24 @@ public class ChatManager {
 
     Gson gson = new Gson();
 
-    public void sendMessage(JFMSClientSendMessage jfmsClientSendMessage) {
+    public void init(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
+        userSessionRepository.addSession(jfmsClientLoginMessage.getUserName(), session);
+    }
 
-        String redisChannelEntityJson = gson.toJson(redisConverter.getRedisChannelEntity(jfmsClientSendMessage));
+    public void sendMessage(JFMSClientSendMessage jfmsClientSendMessage, WebSocketSession session) {
+        RedisChannelEntity redisChannelEntity = redisConverter.getRedisChannelEntity(jfmsClientSendMessage);
+        String redisChannelEntityJson = gson.toJson(redisChannelEntity);
         redisAssist.sendMessage(
                 getChannelName(jfmsClientSendMessage.getFrom() , jfmsClientSendMessage.getTo()),
                 redisChannelEntityJson
         );
+        String messageIdJson = "{\"id\":\"" + redisChannelEntity.getId() + "\"}";
+        try {
+            session.sendMessage(new TextMessage(messageIdJson));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
         //todo save in message history
     }
 
@@ -53,8 +62,16 @@ public class ChatManager {
         //todo edit in message history
     }
 
-    public void init(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
-        userSessionRepository.addSession(jfmsClientLoginMessage.getUserName(), session);
+    public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage, WebSocketSession session) {
+        JFMSServerDeleteMessage jfmsServerDeleteMessage =
+                jfmsMessageConverter.JFMSClientDeleteToJFMSServerDelete(jfmsClientDeleteMessage);
+        try {
+            session.sendMessage(new TextMessage(gson.toJson(jfmsServerDeleteMessage)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+        //todo delete from history
     }
 
     public void removeUserSession(String sessionId) {
