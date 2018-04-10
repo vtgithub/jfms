@@ -1,10 +1,7 @@
 package com.jfms.engine.service;
 
 import com.google.gson.Gson;
-import com.jfms.engine.api.model.JFMSClientDeleteMessage;
-import com.jfms.engine.api.model.JFMSClientEditMessage;
-import com.jfms.engine.api.model.JFMSClientLoginMessage;
-import com.jfms.engine.api.model.JFMSClientSendMessage;
+import com.jfms.engine.api.model.*;
 import com.jfms.engine.api.Method;
 import com.jfms.engine.service.biz.ChatManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +35,14 @@ public class ChatManagerService {
             chatManager.editMessage(jfmsClientEditMessage);
         } else if (methodNo == Method.DELETE.getValue()){
             JFMSClientDeleteMessage jfmsClientDeleteMessage = gson.fromJson(messageInJson, JFMSClientDeleteMessage.class);
-            chatManager.deleteMessage(jfmsClientDeleteMessage, session);
+            chatManager.deleteMessage(jfmsClientDeleteMessage);
+        } else if (methodNo == Method.IS_TYPING.getValue()){
+            JFMSClientIsTypingMessage jfmsClientIsTypingMessage = gson.fromJson(messageInJson, JFMSClientIsTypingMessage.class);
+            chatManager.sendIsTypingMessage(jfmsClientIsTypingMessage);
+        } else if (methodNo == Method.PING.getValue()){
+            JFMSClientPingMessage jfmsClientPingMessage =
+                    gson.fromJson(messageInJson, JFMSClientPingMessage.class);
+            chatManager.updatePresenceTime(jfmsClientPingMessage, session);
         }
     }
 

@@ -1,13 +1,12 @@
 package com.jfms.engine.api.model;
 
 /**
- * Created by vahid on 4/9/18.
+ * Created by vahid on 4/10/18.
  */
-public class JFMSClientDeleteMessage {
+public class JFMSClientIsTypingMessage {
     private Integer method;
     private String from;
     private String to;
-    private  String id;
 
     public Integer getMethod() {
         return method;
@@ -15,14 +14,6 @@ public class JFMSClientDeleteMessage {
 
     public void setMethod(Integer method) {
         this.method = method;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getFrom() {

@@ -5,9 +5,11 @@ package com.jfms.engine.api.model;
  */
 public class JFMSServerDeleteMessage {
     private String id;
+    private String from;
 
-    public JFMSServerDeleteMessage(String id) {
+    public JFMSServerDeleteMessage(String id, String from) {
         this.id = id;
+        this.from = from;
     }
 
     public String getId() {
@@ -16,5 +18,13 @@ public class JFMSServerDeleteMessage {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 }

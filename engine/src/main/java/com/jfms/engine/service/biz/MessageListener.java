@@ -14,12 +14,11 @@ import java.io.IOException;
 
 @Component
 public class MessageListener extends JedisPubSub {
-    @Autowired
-    UserSessionRepository userSessionRepository;
-    @Autowired
-    RedisConverter redisConverter;
 
+    UserSessionRepository userSessionRepository;
+    RedisConverter redisConverter;
     Gson gson = new Gson();
+
     @Override
     public void onPMessage(String pattern, String channel, String message) {
         RedisChannelEntity redisChannelEntity = gson.fromJson(message, RedisChannelEntity.class);
@@ -31,5 +30,10 @@ public class MessageListener extends JedisPubSub {
             //todo log
             e.printStackTrace();
         }
+    }
+
+    public void init(RedisConverter redisConverter, UserSessionRepository userSessionRepository) {
+        this.userSessionRepository = userSessionRepository;
+        this.redisConverter = redisConverter;
     }
 }

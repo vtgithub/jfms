@@ -16,6 +16,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by vahid on 4/3/18.
@@ -29,16 +31,15 @@ public class RedisAssist  {
 //    @Value("onlineRepo.port")
 //    private String portNumber;
 
-    @Autowired
-    Environment environment;
-
     private Jedis publisher;
     private Jedis subscriber;
+    private Jedis presenceHandler;
 
     @Autowired
     public RedisAssist() {
         publisher = new Jedis("localhost", Integer.parseInt("6379"));
         subscriber = new Jedis("localhost", Integer.parseInt("6379"));
+        presenceHandler = new Jedis("localhost", Integer.parseInt("6379"));
     }
 
     public void sendMessage(String channel, String message) {
@@ -58,4 +59,7 @@ public class RedisAssist  {
     }
 
 
+    public void changePresenceTime(String from, Long pingTime) {
+        presenceHandler.hset("presence", from, pingTime.toString());
+    }
 }

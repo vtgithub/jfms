@@ -33,6 +33,7 @@ public class ChatManager implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        messageListener.init(redisConverter, userSessionRepository);
         redisAssist.setMessageListener(messageListener);
     }
 
@@ -71,7 +72,8 @@ public class ChatManager implements InitializingBean {
         //todo edit in message history
     }
 
-    public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage, WebSocketSession session) {
+    public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage) {
+        WebSocketSession session = userSessionRepository.getSession(jfmsClientDeleteMessage.getTo());
         JFMSServerDeleteMessage jfmsServerDeleteMessage =
                 jfmsMessageConverter.JFMSClientDeleteToJFMSServerDelete(jfmsClientDeleteMessage);
         try {
@@ -83,9 +85,33 @@ public class ChatManager implements InitializingBean {
         //todo delete from history
     }
 
+    public void sendIsTypingMessage(JFMSClientIsTypingMessage jfmsClientIsTypingMessage) {
+        WebSocketSession session = userSessionRepository.getSession(jfmsClientIsTypingMessage.getTo());
+        JFMSServerIsTypingMessage jfmsServerIsTypingMessage =
+                jfmsMessageConverter.JFMSClientIsTypingToJFMSServerIsTyping(jfmsClientIsTypingMessage);
+        try {
+            session.sendMessage(new TextMessage(gson.toJson(jfmsServerIsTypingMessage)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+    }
+
+    public void updatePresenceTime(JFMSClientPingMessage jfmsClientPingMessage, WebSocketSession session) {
+        //todo think about this
+        redisAssist.changePresenceTime(jfmsClientPingMessage.getFrom(), System.currentTimeMillis());
+        try {
+            session.sendMessage(new TextMessage("{\"status\":\"ok\"}"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+    }
+
     public void removeUserSession(String sessionId) {
         userSessionRepository.removeBySession(sessionId);
     }
+
 
     //---------------------------------
 
@@ -96,5 +122,4 @@ public class ChatManager implements InitializingBean {
             return to + from;
 
     }
-
 }

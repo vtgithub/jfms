@@ -1,9 +1,6 @@
 package com.jfms.engine.service.biz;
 
-import com.jfms.engine.api.model.JFMSClientDeleteMessage;
-import com.jfms.engine.api.model.JFMSClientEditMessage;
-import com.jfms.engine.api.model.JFMSServerDeleteMessage;
-import com.jfms.engine.api.model.JFMSServerEditMessage;
+import com.jfms.engine.api.model.*;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,6 +23,15 @@ public class JFMSMessageConverter {
     public JFMSServerDeleteMessage JFMSClientDeleteToJFMSServerDelete(JFMSClientDeleteMessage jfmsClientDeleteMessage) {
         if (jfmsClientDeleteMessage == null)
             return null;
-        return new JFMSServerDeleteMessage(jfmsClientDeleteMessage.getId());
+        return new JFMSServerDeleteMessage(
+                    jfmsClientDeleteMessage.getId(),
+                    jfmsClientDeleteMessage.getFrom()
+                );
+    }
+
+    public JFMSServerIsTypingMessage JFMSClientIsTypingToJFMSServerIsTyping(JFMSClientIsTypingMessage jfmsClientIsTypingMessage) {
+        if (jfmsClientIsTypingMessage == null)
+            return null;
+        return new JFMSServerIsTypingMessage(jfmsClientIsTypingMessage.getFrom());
     }
 }

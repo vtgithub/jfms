@@ -5,7 +5,8 @@ public enum Method {
     SEND(2),
     EDIT(3),
     DELETE(4),
-    PING(5);
+    IS_TYPING(5),
+    PING(6);
 
     private int value;
 
