@@ -6,6 +6,9 @@ import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.model.RedisChannelEntity;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -18,45 +21,37 @@ import java.io.IOException;
  * Created by vahid on 4/3/18.
  */
 @Component
-public class RedisAssist implements InitializingBean {
-//    private @Value("onlineRepo.host") String hostName;
-//    private @Value("onlineRepo.port") String portNumber;
+public class RedisAssist  {
+
+//    @Value("onlineRepo.host")
+//    private String hostName;
+//
+//    @Value("onlineRepo.port")
+//    private String portNumber;
 
     @Autowired
-    UserSessionRepository userSessionRepository;
-    @Autowired
-    RedisConverter redisConverter;
-//
+    Environment environment;
+
     private Jedis publisher;
     private Jedis subscriber;
-//
-    public void sendMessage( String channel, String message) {
+
+    @Autowired
+    public RedisAssist() {
+        publisher = new Jedis("localhost", Integer.parseInt("6379"));
+        subscriber = new Jedis("localhost", Integer.parseInt("6379"));
+    }
+
+    public void sendMessage(String channel, String message) {
         publisher.publish(channel , message);
     }
 //
 //
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        publisher = new Jedis("localhost", 6379);
-        subscriber = new Jedis("localhost", 6379);
-        Gson gson = new Gson();
+    public void setMessageListener(JedisPubSub messageListener) throws Exception {
+
         (new Thread(new Runnable() {
             @Override
             public void run() {
-                subscriber.psubscribe(new JedisPubSub() {
-                    @Override
-                    public void onPMessage(String pattern, String channel, String message) {
-                    RedisChannelEntity redisChannelEntity = gson.fromJson(message, RedisChannelEntity.class);
-                    WebSocketSession session = userSessionRepository.getSession(redisChannelEntity.getTo());
-                    JFMSServerSendMessage jfmsServerSendMessage = redisConverter.getJFMSReceiveMessage(redisChannelEntity);
-                    try {
-                        session.sendMessage(new TextMessage(gson.toJson(jfmsServerSendMessage)));
-                    } catch (IOException e) {
-                        //todo log
-                        e.printStackTrace();
-                    }
-                        }
-                    }, "*");
+                subscriber.psubscribe( messageListener, "*");
             }
         })).start();
 

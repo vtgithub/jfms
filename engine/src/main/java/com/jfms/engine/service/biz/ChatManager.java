@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.model.RedisChannelEntity;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -15,7 +16,7 @@ import java.io.IOException;
  * Created by vahid on 4/3/18.
  */
 @Component
-public class ChatManager {
+public class ChatManager implements InitializingBean {
 
     @Autowired
     RedisAssist redisAssist;
@@ -25,8 +26,16 @@ public class ChatManager {
     JFMSMessageConverter jfmsMessageConverter;
     @Autowired
     UserSessionRepository userSessionRepository;
+    @Autowired
+    MessageListener messageListener;
 
     Gson gson = new Gson();
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        redisAssist.setMessageListener(messageListener);
+    }
+
 
     public void init(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
         userSessionRepository.addSession(jfmsClientLoginMessage.getUserName(), session);
@@ -87,4 +96,5 @@ public class ChatManager {
             return to + from;
 
     }
+
 }
