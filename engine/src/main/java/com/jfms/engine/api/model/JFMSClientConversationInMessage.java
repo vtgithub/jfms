@@ -1,20 +1,9 @@
 package com.jfms.engine.api.model;
 
-/**
- * Created by vahid on 4/10/18.
- */
-    public class JFMSClientIsTypingMessage {
-    private Integer method;
+public class JFMSClientConversationInMessage {
+    private String method;
     private String from;
     private String to;
-
-    public Integer getMethod() {
-        return method;
-    }
-
-    public void setMethod(Integer method) {
-        this.method = method;
-    }
 
     public String getFrom() {
         return from;
@@ -30,5 +19,13 @@ package com.jfms.engine.api.model;
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }

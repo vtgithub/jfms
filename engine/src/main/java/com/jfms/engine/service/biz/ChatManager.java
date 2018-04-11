@@ -1,9 +1,16 @@
 package com.jfms.engine.service.biz;
 
 import com.google.gson.Gson;
+import com.jfms.engine.api.converter.JFMSMessageConverter;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
-import com.jfms.engine.service.biz.model.RedisChannelEntity;
+import com.jfms.engine.service.biz.remote.OnlineMessageConverter;
+import com.jfms.engine.service.biz.remote.OnlineMessageListener;
+import com.jfms.engine.service.biz.remote.api.LastSeenRepository;
+import com.jfms.engine.service.biz.remote.api.PresenceRepository;
+import com.jfms.engine.service.biz.remote.api.PresenceRepositoryRedisImpl;
+import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
+import com.jfms.engine.service.biz.remote.api.OnlineMessageRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,22 +26,26 @@ import java.io.IOException;
 public class ChatManager implements InitializingBean {
 
     @Autowired
-    RedisAssist redisAssist;
+    OnlineMessageRepository onlineMessageRepository;
     @Autowired
-    RedisConverter redisConverter;
+    OnlineMessageConverter onlineMessageConverter;
+    @Autowired
+    PresenceRepository presenceRepository;
+    @Autowired
+    LastSeenRepository lastSeenRepository;
     @Autowired
     JFMSMessageConverter jfmsMessageConverter;
     @Autowired
     UserSessionRepository userSessionRepository;
     @Autowired
-    MessageListener messageListener;
+    OnlineMessageListener onlineMessageListener;
 
     Gson gson = new Gson();
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        messageListener.init(redisConverter, userSessionRepository);
-        redisAssist.setMessageListener(messageListener);
+        onlineMessageListener.init(onlineMessageConverter, userSessionRepository);
+        onlineMessageRepository.setMessageListener(onlineMessageListener);
     }
 
 
@@ -43,13 +54,13 @@ public class ChatManager implements InitializingBean {
     }
 
     public void sendMessage(JFMSClientSendMessage jfmsClientSendMessage, WebSocketSession session) {
-        RedisChannelEntity redisChannelEntity = redisConverter.getRedisChannelEntity(jfmsClientSendMessage);
-        String redisChannelEntityJson = gson.toJson(redisChannelEntity);
-        redisAssist.sendMessage(
+        OnlineMessageEntity onlineMessageEntity = onlineMessageConverter.getOnlineMessageEntity(jfmsClientSendMessage);
+        String redisChannelEntityJson = gson.toJson(onlineMessageEntity);
+        onlineMessageRepository.sendMessage(
                 getChannelName(jfmsClientSendMessage.getFrom() , jfmsClientSendMessage.getTo()),
                 redisChannelEntityJson
         );
-        String messageIdJson = "{\"id\":\"" + redisChannelEntity.getId() + "\"}";
+        String messageIdJson = "{\"id\":\"" + onlineMessageEntity.getId() + "\"}";
         try {
             session.sendMessage(new TextMessage(messageIdJson));
         } catch (IOException e) {
@@ -99,9 +110,40 @@ public class ChatManager implements InitializingBean {
 
     public void updatePresenceTime(JFMSClientPingMessage jfmsClientPingMessage, WebSocketSession session) {
         //todo think about this
-        redisAssist.changePresenceTime(jfmsClientPingMessage.getFrom(), System.currentTimeMillis());
+        presenceRepository.changePresenceTime(jfmsClientPingMessage.getFrom(), System.currentTimeMillis());
         try {
             session.sendMessage(new TextMessage("{\"status\":\"ok\"}"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+    }
+
+    public void setLeaveTime(JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage) {
+        String room =
+                getChannelName(jfmsClientConversationLeaveMessage.getFrom(), jfmsClientConversationLeaveMessage.getTo());
+        lastSeenRepository.setLastSeen(room, jfmsClientConversationLeaveMessage.getLeaveTime());
+        JFMSServerConversationMessage jfmsServerConversationMessage =
+                jfmsMessageConverter.JFMSClientConversationLeaveToJFMSServerConversation(jfmsClientConversationLeaveMessage);
+        WebSocketSession session = userSessionRepository.getSession(jfmsClientConversationLeaveMessage.getTo());
+        try {
+            session.sendMessage(new TextMessage(gson.toJson(jfmsServerConversationMessage)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+    }
+
+    public void getLeaveTime(JFMSClientConversationInMessage jfmsClientConversationInMessage, WebSocketSession session) {
+        String room = getChannelName(jfmsClientConversationInMessage.getFrom(), jfmsClientConversationInMessage.getTo());
+        Long leaveTime = lastSeenRepository.getLastSeen(room);
+
+        try {
+            session.sendMessage(
+                    new TextMessage(
+                        gson.toJson(new JFMSServerConversationMessage(jfmsClientConversationInMessage.getTo(), leaveTime))
+                    )
+            );
         } catch (IOException e) {
             e.printStackTrace();
             //todo log

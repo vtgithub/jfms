@@ -6,7 +6,9 @@ public enum Method {
     EDIT(3),
     DELETE(4),
     IS_TYPING(5),
-    PING(6);
+    PING(6),
+    CONVERSATION_LEAVE(7),
+    CONVERSATION_IN(8);
 
     private int value;
 

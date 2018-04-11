@@ -1,11 +1,11 @@
-package com.jfms.engine.service.biz.model;
+package com.jfms.engine.service.biz.remote.model;
 
 import java.util.UUID;
 
 /**
  * Created by vahid on 4/4/18.
  */
-public class RedisChannelEntity {
+public class OnlineMessageEntity {
     private String id = UUID.randomUUID().toString();
     private String from;
     private String to;
@@ -14,7 +14,7 @@ public class RedisChannelEntity {
     private Long sendTime;
 
 
-    public RedisChannelEntity(String from, String to, String message, String subject, Long sendTime) {
+    public OnlineMessageEntity(String from, String to, String message, String subject, Long sendTime) {
         this.from = from;
         this.to = to;
         this.message = message;
@@ -22,7 +22,7 @@ public class RedisChannelEntity {
         this.sendTime = sendTime;
     }
 
-    public RedisChannelEntity() {
+    public OnlineMessageEntity() {
     }
 
     public String getFrom() {

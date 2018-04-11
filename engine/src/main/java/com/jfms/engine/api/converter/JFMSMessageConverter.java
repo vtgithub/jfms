@@ -1,4 +1,4 @@
-package com.jfms.engine.service.biz;
+package com.jfms.engine.api.converter;
 
 import com.jfms.engine.api.model.*;
 import org.springframework.stereotype.Component;
@@ -33,5 +33,15 @@ public class JFMSMessageConverter {
         if (jfmsClientIsTypingMessage == null)
             return null;
         return new JFMSServerIsTypingMessage(jfmsClientIsTypingMessage.getFrom());
+    }
+
+    public JFMSServerConversationMessage JFMSClientConversationLeaveToJFMSServerConversation(
+            JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage) {
+        if (jfmsClientConversationLeaveMessage == null)
+            return null;
+        return new JFMSServerConversationMessage(
+                jfmsClientConversationLeaveMessage.getFrom(),
+                jfmsClientConversationLeaveMessage.getLeaveTime()
+        );
     }
 }

@@ -43,6 +43,14 @@ public class ChatManagerService {
             JFMSClientPingMessage jfmsClientPingMessage =
                     gson.fromJson(messageInJson, JFMSClientPingMessage.class);
             chatManager.updatePresenceTime(jfmsClientPingMessage, session);
+        } else if (methodNo == Method.CONVERSATION_LEAVE.getValue()){
+            JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage =
+                    gson.fromJson(messageInJson, JFMSClientConversationLeaveMessage.class);
+            chatManager.setLeaveTime(jfmsClientConversationLeaveMessage);
+        } else if (methodNo == Method.CONVERSATION_IN.getValue()){
+            JFMSClientConversationInMessage jfmsClientConversationInMessage =
+                    gson.fromJson(messageInJson, JFMSClientConversationInMessage.class);
+            chatManager.getLeaveTime(jfmsClientConversationInMessage, session);
         }
     }
 
