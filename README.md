@@ -21,4 +21,4 @@ websocket port number is `4042`.
 | {`method`, `from`, `to`, `body`, `subject`, `editTime`, `id`} | --- | `JFMSClientEditMessage` is sending to engine. message history is updating previouse value of message by the `id`, convert it to `JFMSServerEditMessage` and send it to the `to` fileld |
 | {`method`, `from` , `id`} | --- | `JFMSClientDeleteMessage` is sending to engine. The message is removing from history , convert it to `JFMSServerDeleteMessage` and send it to the `to` fileld |
 | {`method`, `from`, `to`} | --- | `JFMSClientIsTypingMessage` is sending to engine. Engine generate `JFMSClientIsTypingMessage` from that and sent it to the `to` field. |
-| {`method`, `from`} | ---- | `JFMSClientPingMessage` is sending to engine and engine send back {`status`:`OK`} |
+| {`method`, `from`} | {`status`:`OK`} | `JFMSClientPingMessage` is sending to engine and engine send back {`status`:`OK`} |
