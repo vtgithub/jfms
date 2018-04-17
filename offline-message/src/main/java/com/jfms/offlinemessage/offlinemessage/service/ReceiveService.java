@@ -6,6 +6,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.Properties;
 @Component
 public class ReceiveService {
 
+    @Autowired
+    KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
     private KafkaConsumer<String, String> receiver;
     private Properties props;
     @Autowired
@@ -34,12 +37,14 @@ public class ReceiveService {
                 "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer",
                 "org.apache.kafka.common.serialization.StringDeserializer");
+        receiver= new KafkaConsumer<String, String>(props);
+
 
     }
 
     public List<String> receive(String topic){
+        kafkaListenerEndpointRegistry.stop();
         List<String> offlineMessageInJsonList = new ArrayList<>();
-        receiver= new KafkaConsumer<String, String>(props);
         receiver.subscribe(Arrays.asList(topic));
         ConsumerRecords<String, String> messageRecords = receiver.poll(0);
         for (ConsumerRecord<String, String> messageRecord: messageRecords){
