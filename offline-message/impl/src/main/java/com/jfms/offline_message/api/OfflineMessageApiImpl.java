@@ -1,9 +1,10 @@
-package com.jfms.offlinemessage.offlinemessage.api;
+package com.jfms.offline_message.api;
 
 import com.google.gson.Gson;
-import com.jfms.offlinemessage.offlinemessage.api.model.OfflineMessage;
-import com.jfms.offlinemessage.offlinemessage.service.ReceiveService;
-import com.jfms.offlinemessage.offlinemessage.service.SendService;
+import com.jfms.offline_message.OfflineMessageApi;
+import com.jfms.offline_message.model.OfflineMessage;
+import com.jfms.offline_message.service.ReceiveService;
+import com.jfms.offline_message.service.SendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,21 +14,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+
 import java.util.List;
 
 /**
  * Created by vahid on 4/16/18.
  */
 @Controller
-@RequestMapping(value = "/offline", produces = "application/json", consumes = "application/json")
-public class OfflineMessageHandlerApi {
+//@RequestMapping(value = "/offline", produces = "application/json", consumes = "application/json")
+public class OfflineMessageApiImpl implements OfflineMessageApi{
 
     @Autowired
     private SendService sendService;
     @Autowired
     private ReceiveService receiveService;
     private Gson gson= new Gson();
-    @RequestMapping(value = "/produce", method = RequestMethod.POST)
+
+//    @RequestMapping(value = "/produce", method = RequestMethod.POST)
     public ResponseEntity produceMessage(@RequestBody OfflineMessage offlineMessage){
         try {
             sendService.send(offlineMessage.getTo(), gson.toJson(offlineMessage));
@@ -38,8 +41,7 @@ public class OfflineMessageHandlerApi {
         }
     }
 
-
-    @RequestMapping(value = "/consume/{messageOwner}", method = RequestMethod.GET)
+//    @RequestMapping(value = "/consume/{messageOwner}", method = RequestMethod.GET)
     public ResponseEntity consumeMessage(@PathVariable("messageOwner") String messageOwner){
         try {
             List<String> messageList = receiveService.receive(messageOwner);

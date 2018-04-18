@@ -1,4 +1,4 @@
-package com.jfms.offlinemessage.offlinemessage;
+package com.jfms.offline_message;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

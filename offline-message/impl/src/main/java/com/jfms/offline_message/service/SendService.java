@@ -1,4 +1,4 @@
-package com.jfms.offlinemessage.offlinemessage.service;
+package com.jfms.offline_message.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

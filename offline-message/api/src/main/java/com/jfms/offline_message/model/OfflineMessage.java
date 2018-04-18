@@ -1,4 +1,4 @@
-package com.jfms.offlinemessage.offlinemessage.api.model;
+package com.jfms.offline_message.model;
 
 /**
  * Created by vahid on 4/16/18.

@@ -1,4 +1,4 @@
-package com.jfms.offlinemessage.offlinemessage.service;
+package com.jfms.offline_message.service;
 
 import org.springframework.stereotype.Component;
 
