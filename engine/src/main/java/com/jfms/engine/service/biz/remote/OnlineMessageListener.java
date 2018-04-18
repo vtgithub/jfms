@@ -25,12 +25,16 @@ public class OnlineMessageListener extends JedisPubSub {
 
     Gson gson = new Gson();
     @Override
-//    @HystrixCommand(fallbackMethod = "fallBack")
+    @HystrixCommand(fallbackMethod = "fallBack")
     public void onPMessage(String pattern, String channel, String message) {
         OnlineMessageEntity onlineMessageEntity = gson.fromJson(message, OnlineMessageEntity.class);
         WebSocketSession session = userSessionRepository.getSession(onlineMessageEntity.getTo());
         if (session == null) {
-            offlineMessageApiClient.produceMessage(offlineMessageConverter.getOfflineMessage(onlineMessageEntity));
+            try{
+                offlineMessageApiClient.produceMessage(offlineMessageConverter.getOfflineMessage(onlineMessageEntity));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }else{
             JFMSServerSendMessage jfmsServerSendMessage = onlineMessageConverter.getJFMSReceiveMessage(onlineMessageEntity);
             try {
