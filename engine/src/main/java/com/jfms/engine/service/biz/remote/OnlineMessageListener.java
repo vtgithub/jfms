@@ -5,6 +5,7 @@ import com.jfms.engine.api.model.JFMSServerSendMessage;
 import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.remote.api.OfflineMessageApiClient;
 import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
+import com.jfms.offline_message.OfflineMessageApi;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,15 +20,12 @@ public class OnlineMessageListener extends JedisPubSub {
 
     UserSessionRepository userSessionRepository;
     OnlineMessageConverter onlineMessageConverter;
-    Gson gson = new Gson();
-
-    @Autowired
-    OfflineMessageApiClient offlineMessageApiClient;
-    @Autowired
     OfflineMessageConverter offlineMessageConverter;
+    OfflineMessageApiClient offlineMessageApiClient;
 
+    Gson gson = new Gson();
     @Override
-    @HystrixCommand(fallbackMethod = "fallBack")
+//    @HystrixCommand(fallbackMethod = "fallBack")
     public void onPMessage(String pattern, String channel, String message) {
         OnlineMessageEntity onlineMessageEntity = gson.fromJson(message, OnlineMessageEntity.class);
         WebSocketSession session = userSessionRepository.getSession(onlineMessageEntity.getTo());
@@ -44,9 +42,14 @@ public class OnlineMessageListener extends JedisPubSub {
         }
     }
 
-    public void init(OnlineMessageConverter onlineMessageConverter, UserSessionRepository userSessionRepository) {
-        this.userSessionRepository = userSessionRepository;
+    public void init(OnlineMessageConverter onlineMessageConverter,
+                     OfflineMessageConverter offlineMessageConverter,
+                     OfflineMessageApiClient offlineMessageApiClient,
+                     UserSessionRepository userSessionRepository) {
+        this.offlineMessageConverter = offlineMessageConverter;
+        this.offlineMessageApiClient = offlineMessageApiClient;
         this.onlineMessageConverter = onlineMessageConverter;
+        this.userSessionRepository = userSessionRepository;
     }
 
     public String fallBack(){

@@ -1,8 +1,12 @@
 package com.jfms.engine.service.biz.remote;
 
+import com.jfms.engine.api.model.JFMSServerSendMessage;
 import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
 import com.jfms.offline_message.model.OfflineMessage;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class OfflineMessageConverter {
@@ -17,4 +21,29 @@ public class OfflineMessageConverter {
         offlineMessage.setSubject(onlineMessageEntity.getSubject());
         return offlineMessage;
     }
+
+
+    private JFMSServerSendMessage getJFMSServerSendMessage(OfflineMessage offlineMessage) {
+        if (offlineMessage == null)
+            return null;
+        return new JFMSServerSendMessage(
+                offlineMessage.getId(),
+                offlineMessage.getFrom(),
+                offlineMessage.getBody(),
+                offlineMessage.getSubject(),
+                offlineMessage.getSendTime()
+        );
+    }
+
+    public List<JFMSServerSendMessage> getJFMSServerSendMessageList(List<OfflineMessage> offlineMessageList) {
+        if (offlineMessageList == null)
+            return null;
+        List<JFMSServerSendMessage> jfmsServerSendMessageList = new ArrayList<>();
+        for (OfflineMessage offlineMessage : offlineMessageList) {
+            if (offlineMessage != null)
+                jfmsServerSendMessageList.add(getJFMSServerSendMessage(offlineMessage));
+        }
+        return jfmsServerSendMessageList;
+    }
+
 }

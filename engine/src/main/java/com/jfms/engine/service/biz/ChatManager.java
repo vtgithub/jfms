@@ -4,13 +4,12 @@ import com.google.gson.Gson;
 import com.jfms.engine.api.converter.JFMSMessageConverter;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
+import com.jfms.engine.service.biz.remote.OfflineMessageConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
-import com.jfms.engine.service.biz.remote.api.LastSeenRepository;
-import com.jfms.engine.service.biz.remote.api.PresenceRepository;
-import com.jfms.engine.service.biz.remote.api.PresenceRepositoryRedisImpl;
+import com.jfms.engine.service.biz.remote.api.*;
 import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
-import com.jfms.engine.service.biz.remote.api.OnlineMessageRepository;
+import com.jfms.offline_message.model.OfflineMessage;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +17,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by vahid on 4/3/18.
@@ -39,18 +39,38 @@ public class ChatManager implements InitializingBean {
     UserSessionRepository userSessionRepository;
     @Autowired
     OnlineMessageListener onlineMessageListener;
+    @Autowired
+    OfflineMessageApiClient offlineMessageApiClient;
+    @Autowired
+    OfflineMessageConverter offlineMessageConverter;
 
     Gson gson = new Gson();
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        onlineMessageListener.init(onlineMessageConverter, userSessionRepository);
+        onlineMessageListener.init(
+                onlineMessageConverter,
+                offlineMessageConverter,
+                offlineMessageApiClient,
+                userSessionRepository);
+
         onlineMessageRepository.setMessageListener(onlineMessageListener);
     }
 
 
     public void init(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
         userSessionRepository.addSession(jfmsClientLoginMessage.getUserName(), session);
+        List<OfflineMessage> offlineMessageList =
+                offlineMessageApiClient.consumeMessage(jfmsClientLoginMessage.getUserName());
+        List<JFMSServerSendMessage> jfmsServerSendMessageList =
+                offlineMessageConverter.getJFMSServerSendMessageList(offlineMessageList);
+        String offlineMessageListInJson = gson.toJson(jfmsServerSendMessageList, List.class);
+        try {
+            session.sendMessage(new TextMessage(offlineMessageListInJson));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
     }
 
     public void sendMessage(JFMSClientSendMessage jfmsClientSendMessage, WebSocketSession session) {
