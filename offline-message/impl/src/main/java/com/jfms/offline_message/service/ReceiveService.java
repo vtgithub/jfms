@@ -1,5 +1,7 @@
 package com.jfms.offline_message.service;
 
+import com.google.gson.Gson;
+import com.jfms.offline_message.model.OfflineMessage;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -23,6 +25,7 @@ public class ReceiveService {
     KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
     private KafkaConsumer<String, String> receiver;
     private Properties props;
+    private Gson gson = new Gson();
     @Autowired
     public ReceiveService(@Value("${kafka.bootstrap-servers}") String serverAddress){
         props = new Properties();
@@ -41,13 +44,13 @@ public class ReceiveService {
 
     }
 
-    public List<String> receive(String topic){
+    public List<OfflineMessage> receive(String topic){
         kafkaListenerEndpointRegistry.stop();
-        List<String> offlineMessageInJsonList = new ArrayList<>();
+        List<OfflineMessage> offlineMessageInJsonList = new ArrayList<>();
         receiver.subscribe(Arrays.asList(topic));
         ConsumerRecords<String, String> messageRecords = receiver.poll(0);
         for (ConsumerRecord<String, String> messageRecord: messageRecords){
-            offlineMessageInJsonList.add(messageRecord.value());
+            offlineMessageInJsonList.add(gson.fromJson(messageRecord.value(), OfflineMessage.class));
         }
         return offlineMessageInJsonList;
     }

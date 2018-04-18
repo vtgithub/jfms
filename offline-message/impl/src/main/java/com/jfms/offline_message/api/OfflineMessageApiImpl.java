@@ -5,14 +5,12 @@ import com.jfms.offline_message.OfflineMessageApi;
 import com.jfms.offline_message.model.OfflineMessage;
 import com.jfms.offline_message.service.ReceiveService;
 import com.jfms.offline_message.service.SendService;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
@@ -28,27 +26,16 @@ public class OfflineMessageApiImpl implements OfflineMessageApi{
     private SendService sendService;
     @Autowired
     private ReceiveService receiveService;
-    private Gson gson= new Gson();
 
 //    @RequestMapping(value = "/produce", method = RequestMethod.POST)
-    public ResponseEntity produceMessage(@RequestBody OfflineMessage offlineMessage){
-        try {
-            sendService.send(offlineMessage.getTo(), gson.toJson(offlineMessage));
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }catch (Exception e){
-            //todo log
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public @ResponseBody void produceMessage(@RequestBody OfflineMessage offlineMessage){
+        sendService.send(offlineMessage.getTo(), offlineMessage);
+
     }
 
 //    @RequestMapping(value = "/consume/{messageOwner}", method = RequestMethod.GET)
-    public ResponseEntity consumeMessage(@PathVariable("messageOwner") String messageOwner){
-        try {
-            List<String> messageList = receiveService.receive(messageOwner);
-            return ResponseEntity.status(HttpStatus.OK).body(messageList);
-        }catch (Exception e){
-            //todo log
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public @ResponseBody List<OfflineMessage> consumeMessage(@PathVariable("messageOwner") String messageOwner){
+            List<OfflineMessage> messageList = receiveService.receive(messageOwner);
+        return messageList;
     }
 }
