@@ -8,7 +8,8 @@ public enum Method {
     IS_TYPING(5),
     PING(6),
     CONVERSATION_LEAVE(7),
-    CONVERSATION_IN(8);
+    CONVERSATION_IN(8),
+    SEEN(9);
 
     private int value;
 

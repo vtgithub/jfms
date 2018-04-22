@@ -93,7 +93,7 @@ public class ChatManager implements InitializingBean {
     public void editMessage(JFMSClientEditMessage jfmsClientEditMessage) {
         WebSocketSession receiverSession = userSessionRepository.getSession(jfmsClientEditMessage.getTo());
         JFMSServerEditMessage jfmsServerEditMessage =
-                jfmsMessageConverter.JFMSClientEditToJFMSServerEdit(jfmsClientEditMessage);
+                jfmsMessageConverter.clientEditToServerEdit(jfmsClientEditMessage);
         try {
             receiverSession.sendMessage(new TextMessage(gson.toJson(jfmsServerEditMessage)));
         } catch (IOException e) {
@@ -106,7 +106,7 @@ public class ChatManager implements InitializingBean {
     public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage) {
         WebSocketSession session = userSessionRepository.getSession(jfmsClientDeleteMessage.getTo());
         JFMSServerDeleteMessage jfmsServerDeleteMessage =
-                jfmsMessageConverter.JFMSClientDeleteToJFMSServerDelete(jfmsClientDeleteMessage);
+                jfmsMessageConverter.clientDeleteToServerDelete(jfmsClientDeleteMessage);
         try {
             session.sendMessage(new TextMessage(gson.toJson(jfmsServerDeleteMessage)));
         } catch (IOException e) {
@@ -119,7 +119,7 @@ public class ChatManager implements InitializingBean {
     public void sendIsTypingMessage(JFMSClientIsTypingMessage jfmsClientIsTypingMessage) {
         WebSocketSession session = userSessionRepository.getSession(jfmsClientIsTypingMessage.getTo());
         JFMSServerIsTypingMessage jfmsServerIsTypingMessage =
-                jfmsMessageConverter.JFMSClientIsTypingToJFMSServerIsTyping(jfmsClientIsTypingMessage);
+                jfmsMessageConverter.clientIsTypingToServerIsTyping(jfmsClientIsTypingMessage);
         try {
             session.sendMessage(new TextMessage(gson.toJson(jfmsServerIsTypingMessage)));
         } catch (IOException e) {
@@ -144,7 +144,7 @@ public class ChatManager implements InitializingBean {
                 getChannelName(jfmsClientConversationLeaveMessage.getFrom(), jfmsClientConversationLeaveMessage.getTo());
         lastSeenRepository.setLastSeen(room, jfmsClientConversationLeaveMessage.getLeaveTime());
         JFMSServerConversationMessage jfmsServerConversationMessage =
-                jfmsMessageConverter.JFMSClientConversationLeaveToJFMSServerConversation(jfmsClientConversationLeaveMessage);
+                jfmsMessageConverter.clientConversationLeaveToServerConversation(jfmsClientConversationLeaveMessage);
         WebSocketSession session = userSessionRepository.getSession(jfmsClientConversationLeaveMessage.getTo());
         try {
             session.sendMessage(new TextMessage(gson.toJson(jfmsServerConversationMessage)));
@@ -164,6 +164,17 @@ public class ChatManager implements InitializingBean {
                         gson.toJson(new JFMSServerConversationMessage(jfmsClientConversationInMessage.getTo(), leaveTime))
                     )
             );
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+    }
+
+    public void setSeen(JFMSClientSeenMessage jfmsClientSeenMessage) {
+        WebSocketSession session = userSessionRepository.getSession(jfmsClientSeenMessage.getTo());
+        JFMSServerSeenMessage jfmsServerSeenMessage = jfmsMessageConverter.clientSeentoServerSeen(jfmsClientSeenMessage);
+        try {
+            session.sendMessage(new TextMessage(gson.toJson(jfmsServerSeenMessage)));
         } catch (IOException e) {
             e.printStackTrace();
             //todo log

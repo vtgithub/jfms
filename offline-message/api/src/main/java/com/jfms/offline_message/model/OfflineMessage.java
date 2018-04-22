@@ -4,6 +4,7 @@ package com.jfms.offline_message.model;
  * Created by vahid on 4/16/18.
  */
 public class OfflineMessage {
+    private String id;
     private String from;
     private String to;
     private String body;
@@ -48,5 +49,13 @@ public class OfflineMessage {
 
     public void setSendTime(Long sendTime) {
         this.sendTime = sendTime;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

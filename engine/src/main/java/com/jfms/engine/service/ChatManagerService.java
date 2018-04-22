@@ -51,6 +51,10 @@ public class ChatManagerService {
             JFMSClientConversationInMessage jfmsClientConversationInMessage =
                     gson.fromJson(messageInJson, JFMSClientConversationInMessage.class);
             chatManager.getLeaveTime(jfmsClientConversationInMessage, session);
+        } else if (methodNo == Method.SEEN.getValue()){
+            JFMSClientSeenMessage jfmsClientSeenMessage =
+                    gson.fromJson(messageInJson, JFMSClientSeenMessage.class);
+            chatManager.setSeen(jfmsClientSeenMessage);
         }
     }
 
