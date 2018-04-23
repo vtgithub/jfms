@@ -16,7 +16,7 @@ import java.util.List;
 @Configuration
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
-    public static final String KEYSPACE = "test_keyspace";
+    public static final String KEYSPACE = "history_keyspace";
 
     @Override
     public SchemaAction getSchemaAction() {
@@ -42,6 +42,6 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Override
     public String[] getEntityBasePackages() {
-        return new String[]{"dev.springframework.domain"};
+        return new String[]{"com.jfms.message_history.dal.entity"};
     }
 }
