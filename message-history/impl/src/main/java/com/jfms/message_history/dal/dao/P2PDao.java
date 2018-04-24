@@ -11,8 +11,8 @@ import java.util.UUID;
 public interface P2PDao extends CrudRepository<P2PEntity, UUID>{
 //    List<P2PEntity> findByOwnerAndFrom(String userId, String rosterId, Pageable pageable);
 //    P2PEntity findByOwnerAndMessageId(String owner, String messageId);
-    @Query("SELECT * FROM P2PEntity")
+    @Query("SELECT * FROM P2PEntity where owner = ?0 AND sender = ?1 AND status <= 2  ALLOW FILTERING")
     List<P2PEntity> findByOwnerAndFromAndStatus(String owner, String from, PageRequest time);
-    @Query("SELECT * FROM P2PEntity where owner like ?0 AND messageId like ?1 And status = 1 OR status = 2")
+    @Query("SELECT * FROM P2PEntity where owner = ?0 AND messageId = ?1 And status <= 2  ALLOW FILTERING")
     P2PEntity findByOwnerAndMessageIdAndStatus(String owner, String messageId);
 }
