@@ -17,7 +17,7 @@ public class MessageConverter {
         P2PEntity p2PEntity = new P2PEntity();
         p2PEntity.setOwner(userId);
         p2PEntity.setBody(messageForHistory.getBody());
-        p2PEntity.setFrom(messageForHistory.getFrom());
+        p2PEntity.setSender(messageForHistory.getSender());
         p2PEntity.setMessageId(messageForHistory.getMessageId());
         p2PEntity.setSubject(messageForHistory.getSubject());
         p2PEntity.setTime(messageForHistory.getTime());
@@ -52,7 +52,7 @@ public class MessageConverter {
             return null;
         P2PMessage p2PMessage = new P2PMessage(
                 p2PEntity.getMessageId(),
-                p2PEntity.getFrom(),
+                p2PEntity.getSender(),
                 p2PEntity.getBody(),
                 p2PEntity.getSubject(),
                 p2PEntity.getTime()

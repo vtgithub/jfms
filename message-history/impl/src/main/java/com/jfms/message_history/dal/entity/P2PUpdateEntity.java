@@ -12,24 +12,21 @@ import java.util.UUID;
 public class P2PUpdateEntity implements Serializable {
     @PrimaryKeyColumn(
             name = "id",
-            type = PrimaryKeyType.CLUSTERED,
-            ordinal = 2,
-            ordering = Ordering.DESCENDING
+            type = PrimaryKeyType.PARTITIONED,
+            ordinal = 0
     )
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @PrimaryKeyColumn(
             name = "editor",
-            type = PrimaryKeyType.PARTITIONED,
-            ordinal = 0,
-            ordering = Ordering.ASCENDING
+            type = PrimaryKeyType.CLUSTERED,
+            ordinal = 1
     )
     private String editor;
     @PrimaryKeyColumn(
             name = "messageId",
-            type = PrimaryKeyType.PARTITIONED,
-            ordinal = 1,
-            ordering = Ordering.ASCENDING
+            type = PrimaryKeyType.CLUSTERED,
+            ordinal = 2
     )
     private String messageId;
 

@@ -42,10 +42,10 @@ public class P2PService {
         p2PUpdateDao.save(p2PUpdateEntity);
     }
 
-    public List<P2PMessage> getUserP2PMessages(String userId, P2PMessageRequest p2PMessageRequest) {
+    public List<P2PMessage> getUserP2PMessages(String userId, String rosterId, P2PMessageRequest p2PMessageRequest) {
         List<P2PEntity> p2PEntityList = p2PDao.findByOwnerAndFromAndStatus(
                 userId,
-                p2PMessageRequest.getRosterId(),
+                rosterId,
                 PageRequest.of(
                         p2PMessageRequest.getPageNumber(),
                         p2PMessageRequest.getPageSize(),

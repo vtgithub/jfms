@@ -4,7 +4,6 @@ public class P2PMessageRequest {
 
     private Integer pageNumber;
     private Integer pageSize;
-    private String rosterId;
 
 
     public Integer getPageNumber() {
@@ -23,11 +22,5 @@ public class P2PMessageRequest {
         this.pageSize = pageSize;
     }
 
-    public String getRosterId() {
-        return rosterId;
-    }
 
-    public void setRosterId(String rosterId) {
-        this.rosterId = rosterId;
-    }
 }

@@ -11,7 +11,7 @@ public class DalAssistant {
             return null;
         P2PUpdateEntity p2PUpdateEntity = new P2PUpdateEntity();
         p2PUpdateEntity.setMessageId(p2PEntity.getMessageId());
-        p2PUpdateEntity.setEditor(p2PEntity.getFrom());
+        p2PUpdateEntity.setEditor(p2PEntity.getSender());
         p2PUpdateEntity.setPreviousValue(previousValue);
         p2PUpdateEntity.setCurrentValue(p2PEntity.getBody());
         return p2PUpdateEntity;
