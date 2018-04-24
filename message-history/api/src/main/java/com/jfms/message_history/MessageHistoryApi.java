@@ -16,7 +16,7 @@ public interface MessageHistoryApi {
     void UpdateHistoryMessage(@PathVariable("userId") String userId, @RequestBody P2PMessage messageForUpdate);
 
     @RequestMapping(value = "/p2p/{userId}/{rosterId}", method = RequestMethod.POST) // getting messages by pagination
-    @ResponseBody List<P2PMessage> getUserP2PMessages(@PathVariable("userId") String userId,
+    List<P2PMessage> getUserP2PMessages(@PathVariable("userId") String userId,
                                                       @PathVariable("rosterId") String rosterId,
                                                       @RequestBody P2PMessageRequest p2PMessageRequest);
 

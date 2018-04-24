@@ -16,12 +16,12 @@ public class MessageHistoryApiImpl implements MessageHistoryApi{
     @Autowired
     private P2PService p2PService;
 
-    public void saveHistoryMessage(@PathVariable("userId") String userId, @RequestBody P2PMessage messageForHistory) {
+    public @ResponseBody void saveHistoryMessage(@PathVariable("userId") String userId, @RequestBody P2PMessage messageForHistory) {
         p2PService.saveMessage(userId, messageForHistory);
 
     }
 
-    public void UpdateHistoryMessage(@PathVariable("userId") String userId, @RequestBody P2PMessage messageForUpdate) {
+    public @ResponseBody void UpdateHistoryMessage(@PathVariable("userId") String userId, @RequestBody P2PMessage messageForUpdate) {
         p2PService.editMessage(userId, messageForUpdate);
     }
 
@@ -32,7 +32,7 @@ public class MessageHistoryApiImpl implements MessageHistoryApi{
         return p2PMessageList;
     }
 
-    public void deleteP2PMessage(@PathVariable("userId") String userId, @RequestBody List<String> messageIdList) {
+    public @ResponseBody void deleteP2PMessage(@PathVariable("userId") String userId, @RequestBody List<String> messageIdList) {
         p2PService.deleteP2PMessage(userId, messageIdList);
     }
 
