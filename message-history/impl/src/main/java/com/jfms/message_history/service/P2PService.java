@@ -34,7 +34,8 @@ public class P2PService {
     }
 
     public void editMessage(String userId, P2PMessage messageForUpdate) {
-        P2PEntity previousP2PEntity = p2PDao.findByOwnerAndMessageIdAndStatus(userId, messageForUpdate.getMessageId());
+        P2PEntity previousP2PEntity = p2PDao.findByOwnerAndMessageIdAndStatusGreaterThanEqualAndStatusLessThanEqual(
+                userId, messageForUpdate.getMessageId(), 1, 2);
         String previousValue = previousP2PEntity.getBody();
         P2PEntity newP2PEntity = messageConverter.p2PMessageToP2pEntity(messageForUpdate, previousP2PEntity);
         p2PDao.save(newP2PEntity);
@@ -43,20 +44,32 @@ public class P2PService {
     }
 
     public List<P2PMessage> getUserP2PMessages(String userId, String rosterId, P2PMessageRequest p2PMessageRequest) {
-        List<P2PEntity> p2PEntityList = p2PDao.findByOwnerAndFromAndStatus(
+//        List<P2PEntity> p2PEntityList = p2PDao.findByOwnerAndSenderAndStatus(
+//                userId,
+//                rosterId,
+//                PageRequest.of(
+//                        p2PMessageRequest.getPageNumber(),
+//                        p2PMessageRequest.getPageSize(),
+//                        Sort.Direction.DESC,"time")
+//        );
+
+        List<P2PEntity> p2PEntityList =
+                p2PDao.findByOwnerAndSenderAndStatusGreaterThanEqualAndStatusLessThanEqual(
                 userId,
                 rosterId,
-                PageRequest.of(
-                        p2PMessageRequest.getPageNumber(),
-                        p2PMessageRequest.getPageSize(),
-                        Sort.Direction.DESC,"time")
+                1,
+                2
+//                PageRequest.of(
+//                        p2PMessageRequest.getPageNumber(),
+//                        p2PMessageRequest.getPageSize())
         );
         return messageConverter.p2PEntityListToP2PMessageList(p2PEntityList);
     }
 
     public void deleteP2PMessage(String userId, List<String> messageIdList) {
         for (String messageId : messageIdList) {
-            P2PEntity p2PEntity= p2PDao.findByOwnerAndMessageIdAndStatus(userId, messageId);
+            P2PEntity p2PEntity= p2PDao.findByOwnerAndMessageIdAndStatusGreaterThanEqualAndStatusLessThanEqual(
+                    userId, messageId, 1, 2);
             p2PEntity.setStatus(EntityStatus.DELETED.getValue());
             p2PDao.save(p2PEntity);
         }

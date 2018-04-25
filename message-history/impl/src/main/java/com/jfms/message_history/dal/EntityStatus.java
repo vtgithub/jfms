@@ -1,21 +1,21 @@
 package com.jfms.message_history.dal;
 
 public enum EntityStatus {
-    INSERTED((byte)1),
-    UPDATED((byte)2),
-    DELETED((byte)3);
+    INSERTED(1),
+    UPDATED(2),
+    DELETED(3);
 
-    private byte status;
+    private Integer status;
 
-    EntityStatus(byte status) {
+    EntityStatus(Integer status) {
         this.status = status;
     }
 
-    public byte getValue() {
-        return INSERTED.status;
+    public Integer getValue() {
+        return status;
     }
 
-    public void setStatus(byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }

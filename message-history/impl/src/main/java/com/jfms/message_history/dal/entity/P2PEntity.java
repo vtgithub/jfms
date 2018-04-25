@@ -16,24 +16,24 @@ public class P2PEntity implements Serializable {
             type = PrimaryKeyType.PARTITIONED,
             ordinal = 0
     )
-    private UUID id = UUID.randomUUID();
+    private UUID _id = UUID.randomUUID();
 
     @PrimaryKeyColumn(
             name = "owner",
-            type = PrimaryKeyType.CLUSTERED,
+            type = PrimaryKeyType.PARTITIONED,
             ordinal = 1
     )
     @Indexed
     private String owner;
     @PrimaryKeyColumn(
             name = "messageId",
-            type = PrimaryKeyType.CLUSTERED,
+            type = PrimaryKeyType.PARTITIONED,
             ordinal = 2
     )
     private String messageId;
     @PrimaryKeyColumn(
             name = "sender",
-            type = PrimaryKeyType.CLUSTERED,
+            type = PrimaryKeyType.PARTITIONED,
             ordinal = 3
     )
     private String sender;
@@ -46,19 +46,18 @@ public class P2PEntity implements Serializable {
     @PrimaryKeyColumn(
             name = "status",
             type = PrimaryKeyType.CLUSTERED,
-            ordinal = 5,
-            ordering = Ordering.DESCENDING
+            ordinal = 5
     )
-    private Byte status;
+    private Integer status;
     private String body;
     private String subject;
 
-    public UUID getId() {
-        return id;
+    public UUID get_id() {
+        return _id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void set_id(UUID _id) {
+        this._id = _id;
     }
 
     public String getOwner() {
@@ -109,11 +108,11 @@ public class P2PEntity implements Serializable {
         this.time = time;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }
