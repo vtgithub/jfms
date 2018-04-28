@@ -1,8 +1,10 @@
 package com.jfms.message_history.dal.entity;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Indexed;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -10,7 +12,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Table
-public class P2PEntity implements Serializable {
+public class P2PEntity implements Serializable, Comparable<P2PEntity>{
     @PrimaryKeyColumn(
             name = "id",
             type = PrimaryKeyType.PARTITIONED,
@@ -43,11 +45,12 @@ public class P2PEntity implements Serializable {
             ordinal = 4
     )
     private Long time;
-    @PrimaryKeyColumn(
-            name = "status",
-            type = PrimaryKeyType.CLUSTERED,
-            ordinal = 5
-    )
+//    @PrimaryKeyColumn(
+//            name = "status",
+//            type = PrimaryKeyType.CLUSTERED,
+//            ordinal = 5
+//    )
+    @Indexed
     private Integer status;
     private String body;
     private String subject;
@@ -114,5 +117,10 @@ public class P2PEntity implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+
+    public int compareTo(P2PEntity o) {
+        return (int) (this.time - o.time);
     }
 }

@@ -9,11 +9,15 @@ import com.jfms.message_history.dal.entity.P2PEntity;
 import com.jfms.message_history.dal.entity.P2PUpdateEntity;
 import com.jfms.message_history.model.P2PMessage;
 import com.jfms.message_history.model.P2PMessageRequest;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -38,8 +42,14 @@ public class P2PService {
                 userId, messageForUpdate.getMessageId(), 1, 2);
         String previousValue = previousP2PEntity.getBody();
         P2PEntity newP2PEntity = messageConverter.p2PMessageToP2pEntity(messageForUpdate, previousP2PEntity);
-        p2PDao.save(newP2PEntity);
-        P2PUpdateEntity p2PUpdateEntity = dalAssistant.getP2PUpdateEntityFromP2PEntity(previousValue, newP2PEntity);
+        if (previousP2PEntity.getStatus() == EntityStatus.INSERTED.getValue()){
+            p2PDao.save(newP2PEntity);
+        }
+        P2PUpdateEntity p2PUpdateEntity = dalAssistant.getP2PUpdateEntityFromP2PEntity(
+                previousValue,
+                messageForUpdate.getTime(),
+                newP2PEntity
+        );
         p2PUpdateDao.save(p2PUpdateEntity);
     }
 
@@ -63,7 +73,22 @@ public class P2PService {
 //                        p2PMessageRequest.getPageNumber(),
 //                        p2PMessageRequest.getPageSize())
         );
-        return messageConverter.p2PEntityListToP2PMessageList(p2PEntityList);
+        Collections.sort(p2PEntityList);
+        List<P2PMessage> sendP2PMessageList = messageConverter.p2PEntityListToP2PMessageList(p2PEntityList);
+        p2PEntityList =
+                p2PDao.findByOwnerAndSenderAndStatusGreaterThanEqualAndStatusLessThanEqual(
+                        rosterId,
+                        userId,
+                        1,
+                        2
+//                PageRequest.of(
+//                        p2PMessageRequest.getPageNumber(),
+//                        p2PMessageRequest.getPageSize())
+                );
+        Collections.sort(p2PEntityList);
+        List<P2PMessage> replayP2PMessageList = messageConverter.p2PEntityListToP2PMessageList(p2PEntityList);
+
+        return merge(sendP2PMessageList, replayP2PMessageList);
     }
 
     public void deleteP2PMessage(String userId, List<String> messageIdList) {
@@ -73,5 +98,34 @@ public class P2PService {
             p2PEntity.setStatus(EntityStatus.DELETED.getValue());
             p2PDao.save(p2PEntity);
         }
+    }
+
+    //------ helper
+
+    private List<P2PMessage> merge(List<P2PMessage> sendP2PMessageList, List<P2PMessage> replayP2PMessageList) {
+        List<P2PMessage> conversation = new ArrayList<P2PMessage>();
+        if (sendP2PMessageList == null && replayP2PMessageList == null)
+            return null;
+        if (sendP2PMessageList == null)
+            return replayP2PMessageList;
+        if (replayP2PMessageList == null)
+            return sendP2PMessageList;
+        int i = 0;
+        int j = 0;
+        while (i != sendP2PMessageList.size() && j!=replayP2PMessageList.size()){
+            if (sendP2PMessageList.get(i).getTime() < replayP2PMessageList.get(j).getTime()){
+                conversation.add(sendP2PMessageList.get(i));
+                i++;
+            }
+            else{
+                conversation.add(replayP2PMessageList.get(j));
+                j++;
+            }
+        }
+        if (i == sendP2PMessageList.size() && j < replayP2PMessageList.size())
+            conversation.addAll(replayP2PMessageList.subList(j, replayP2PMessageList.size()));
+        else if (j == replayP2PMessageList.size() && i < sendP2PMessageList.size() )
+            conversation.addAll(sendP2PMessageList.subList(i, sendP2PMessageList.size()));
+        return conversation;
     }
 }

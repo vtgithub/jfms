@@ -30,6 +30,7 @@ public class P2PUpdateEntity implements Serializable {
     )
     private String messageId;
 
+    private Long updateTime;
     private String previousValue;
     private String currentValue;
 
@@ -71,5 +72,13 @@ public class P2PUpdateEntity implements Serializable {
 
     public void setCurrentValue(String currentValue) {
         this.currentValue = currentValue;
+    }
+
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
     }
 }

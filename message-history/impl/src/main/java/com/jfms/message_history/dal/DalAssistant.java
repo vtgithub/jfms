@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DalAssistant {
-    public P2PUpdateEntity getP2PUpdateEntityFromP2PEntity(String previousValue, P2PEntity p2PEntity){
+    public P2PUpdateEntity getP2PUpdateEntityFromP2PEntity(String previousValue, Long time, P2PEntity p2PEntity){
         if (p2PEntity == null)
             return null;
         P2PUpdateEntity p2PUpdateEntity = new P2PUpdateEntity();
@@ -14,6 +14,7 @@ public class DalAssistant {
         p2PUpdateEntity.setEditor(p2PEntity.getSender());
         p2PUpdateEntity.setPreviousValue(previousValue);
         p2PUpdateEntity.setCurrentValue(p2PEntity.getBody());
+        p2PUpdateEntity.setUpdateTime(time);
         return p2PUpdateEntity;
     }
 }

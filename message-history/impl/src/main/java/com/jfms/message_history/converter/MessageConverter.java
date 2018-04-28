@@ -32,7 +32,7 @@ public class MessageConverter {
 //        previousP2PEntity.setFrom(messageForHistory.getFrom());
 //        previousP2PEntity.setMessageId(messageForHistory.getMessageId());
         previousP2PEntity.setSubject(messageForHistory.getSubject());
-        previousP2PEntity.setTime(messageForHistory.getTime());
+//        previousP2PEntity.setTime(messageForHistory.getTime());
         previousP2PEntity.setStatus(EntityStatus.UPDATED.getValue());
         return previousP2PEntity;
     }

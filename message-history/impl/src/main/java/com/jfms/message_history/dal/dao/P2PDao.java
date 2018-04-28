@@ -16,6 +16,8 @@ public interface P2PDao extends CrudRepository<P2PEntity, UUID>{
             String owner, String from, Integer statusGreater, Integer statusLess);
 //    @Query(value = "SELECT * FROM P2PEntity where owner = ?0 AND messageId = ?1 AND status <= 2" , allowFiltering = true)
     @Query(allowFiltering = true)
-        P2PEntity findByOwnerAndMessageIdAndStatusGreaterThanEqualAndStatusLessThanEqual(
+    P2PEntity findByOwnerAndMessageIdAndStatusGreaterThanEqualAndStatusLessThanEqual(
             String owner, String messageId, Integer statusGreater, Integer statusLess);
+//    @Query
+//    void
 }
