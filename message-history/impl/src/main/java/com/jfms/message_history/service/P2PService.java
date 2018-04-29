@@ -9,15 +9,11 @@ import com.jfms.message_history.dal.entity.P2PEntity;
 import com.jfms.message_history.dal.entity.P2PUpdateEntity;
 import com.jfms.message_history.model.P2PMessage;
 import com.jfms.message_history.model.P2PMessageRequest;
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
