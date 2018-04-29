@@ -6,7 +6,7 @@ import java.util.UUID;
  * Created by vahid on 4/4/18.
  */
 public class OnlineMessageEntity {
-    private String id = UUID.randomUUID().toString();
+    private String id;
     private String from;
     private String to;
     private String message;
@@ -14,7 +14,8 @@ public class OnlineMessageEntity {
     private Long sendTime;
 
 
-    public OnlineMessageEntity(String from, String to, String message, String subject, Long sendTime) {
+    public OnlineMessageEntity(String id, String from, String to, String message, String subject, Long sendTime) {
+        this.id = id;
         this.from = from;
         this.to = to;
         this.message = message;

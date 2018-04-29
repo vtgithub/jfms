@@ -1,5 +1,7 @@
 package com.jfms.engine.dal;
 
+import com.jfms.engine.service.biz.UserStatus;
+import com.jfms.engine.service.biz.remote.api.PresenceRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -23,10 +25,12 @@ public class UserSessionRepository {
         userSessionMap.put(user, session);
     }
 
-    public void removeBySession(String sessionId){
+    public void removeBySession(String sessionId, PresenceRepository presenceRepository){
         Iterator<Map.Entry<String, WebSocketSession>> iterator = userSessionMap.entrySet().iterator();
         while (iterator.hasNext()){
-            if (iterator.next().getValue().getId().trim().equals(sessionId.trim())){
+            Map.Entry<String, WebSocketSession> sessionMap= iterator.next();
+            if (sessionMap.getValue().getId().trim().equals(sessionId.trim())){
+                presenceRepository.setPresenceStatus(sessionMap.getKey(), UserStatus.OFFLINE.getValue());
                 iterator.remove();
             }
         }

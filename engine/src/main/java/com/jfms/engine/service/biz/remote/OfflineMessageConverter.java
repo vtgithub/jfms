@@ -1,5 +1,6 @@
 package com.jfms.engine.service.biz.remote;
 
+import com.jfms.engine.api.model.JFMSClientSendMessage;
 import com.jfms.engine.api.model.JFMSServerSendMessage;
 import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
 import com.jfms.offline_message.model.OfflineMessage;
@@ -19,6 +20,20 @@ public class OfflineMessageConverter {
         offlineMessage.setBody(onlineMessageEntity.getMessage());
         offlineMessage.setSendTime(onlineMessageEntity.getSendTime());
         offlineMessage.setSubject(onlineMessageEntity.getSubject());
+        return offlineMessage;
+    }
+
+
+    public OfflineMessage getOfflineMessage(String messageId, JFMSClientSendMessage jfmsClientSendMessage) {
+        if (jfmsClientSendMessage == null)
+            return null;
+        OfflineMessage offlineMessage = new OfflineMessage();
+        offlineMessage.setFrom(jfmsClientSendMessage.getFrom());
+        offlineMessage.setTo(jfmsClientSendMessage.getTo());
+        offlineMessage.setSubject(jfmsClientSendMessage.getSubject());
+        offlineMessage.setSendTime(jfmsClientSendMessage.getSendTime());
+        offlineMessage.setBody(jfmsClientSendMessage.getBody());
+        offlineMessage.setId(messageId);
         return offlineMessage;
     }
 
@@ -45,5 +60,4 @@ public class OfflineMessageConverter {
         }
         return jfmsServerSendMessageList;
     }
-
 }

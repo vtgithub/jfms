@@ -18,6 +18,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by vahid on 4/3/18.
@@ -50,8 +51,6 @@ public class ChatManager implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         onlineMessageListener.init(
                 onlineMessageConverter,
-                offlineMessageConverter,
-                offlineMessageApiClient,
                 userSessionRepository);
 
         onlineMessageRepository.setMessageListener(onlineMessageListener);
@@ -60,6 +59,7 @@ public class ChatManager implements InitializingBean {
 
     public void init(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
         userSessionRepository.addSession(jfmsClientLoginMessage.getUserName(), session);
+        presenceRepository.setPresenceStatus(jfmsClientLoginMessage.getUserName(), UserStatus.ONLINE.getValue());
         List<OfflineMessage> offlineMessageList =
                 offlineMessageApiClient.consumeMessage(jfmsClientLoginMessage.getUserName());
         List<JFMSServerSendMessage> jfmsServerSendMessageList =
@@ -74,13 +74,20 @@ public class ChatManager implements InitializingBean {
     }
 
     public void sendMessage(JFMSClientSendMessage jfmsClientSendMessage, WebSocketSession session) {
-        OnlineMessageEntity onlineMessageEntity = onlineMessageConverter.getOnlineMessageEntity(jfmsClientSendMessage);
-        String redisChannelEntityJson = gson.toJson(onlineMessageEntity);
-        onlineMessageRepository.sendMessage(
-                getChannelName(jfmsClientSendMessage.getFrom() , jfmsClientSendMessage.getTo()),
-                redisChannelEntityJson
-        );
-        String messageIdJson = "{\"id\":\"" + onlineMessageEntity.getId() + "\"}";
+        String messageId = UUID.randomUUID().toString();
+        String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientSendMessage.getTo());
+        if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
+            OfflineMessage offlineMessage = offlineMessageConverter.getOfflineMessage(messageId, jfmsClientSendMessage);
+            offlineMessageApiClient.produceMessage(offlineMessage);
+        }else{
+            OnlineMessageEntity onlineMessageEntity = onlineMessageConverter.getOnlineMessageEntity(messageId, jfmsClientSendMessage);
+            String redisChannelEntityJson = gson.toJson(onlineMessageEntity);
+            onlineMessageRepository.sendMessage(
+                    getChannelName(jfmsClientSendMessage.getFrom() , jfmsClientSendMessage.getTo()),
+                    redisChannelEntityJson
+            );
+        }
+        String messageIdJson = "{\"id\":\"" + messageId + "\"}";
         try {
             session.sendMessage(new TextMessage(messageIdJson));
         } catch (IOException e) {
@@ -91,6 +98,7 @@ public class ChatManager implements InitializingBean {
     }
 
     public void editMessage(JFMSClientEditMessage jfmsClientEditMessage) {
+//        String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientEditMessage.getTo());
         WebSocketSession receiverSession = userSessionRepository.getSession(jfmsClientEditMessage.getTo());
         JFMSServerEditMessage jfmsServerEditMessage =
                 jfmsMessageConverter.clientEditToServerEdit(jfmsClientEditMessage);
@@ -182,7 +190,9 @@ public class ChatManager implements InitializingBean {
     }
 
     public void removeUserSession(String sessionId) {
-        userSessionRepository.removeBySession(sessionId);
+        userSessionRepository.removeBySession(sessionId, presenceRepository);
+//        presenceRepository.setPresenceStatus(jfmsClientLoginMessage.getUserName(), UserStatus.ONLINE.getValue());
+
     }
 
 

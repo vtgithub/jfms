@@ -11,10 +11,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class OnlineMessageConverter {
 
-    public OnlineMessageEntity getOnlineMessageEntity(JFMSClientSendMessage jfmsClientSendMessage){
+    public OnlineMessageEntity getOnlineMessageEntity(String messageId, JFMSClientSendMessage jfmsClientSendMessage){
         if (jfmsClientSendMessage == null)
             return null;
         OnlineMessageEntity onlineMessageEntity = new OnlineMessageEntity(
+                messageId,
                 jfmsClientSendMessage.getFrom(),
                 jfmsClientSendMessage.getTo(),
                 jfmsClientSendMessage.getBody(),

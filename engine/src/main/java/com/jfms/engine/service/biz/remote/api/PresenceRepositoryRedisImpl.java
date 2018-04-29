@@ -16,4 +16,13 @@ public class PresenceRepositoryRedisImpl implements PresenceRepository {
     public void changePresenceTime(String from, Long pingTime) {
         presenceHandler.hset("presence", from, pingTime.toString());
     }
+
+    public void setPresenceStatus(String user, String status){
+        presenceHandler.hset("presenceStatus",user, status);
+    }
+
+    public String getPresenceStatus(String user){
+        return presenceHandler.hget("presenceStatus", user);
+    }
+
 }

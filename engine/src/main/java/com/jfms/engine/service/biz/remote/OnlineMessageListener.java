@@ -20,8 +20,8 @@ public class OnlineMessageListener extends JedisPubSub {
 
     UserSessionRepository userSessionRepository;
     OnlineMessageConverter onlineMessageConverter;
-    OfflineMessageConverter offlineMessageConverter;
-    OfflineMessageApiClient offlineMessageApiClient;
+//    OfflineMessageConverter offlineMessageConverter;
+//    OfflineMessageApiClient offlineMessageApiClient;
 
     Gson gson = new Gson();
     @Override
@@ -30,11 +30,11 @@ public class OnlineMessageListener extends JedisPubSub {
         OnlineMessageEntity onlineMessageEntity = gson.fromJson(message, OnlineMessageEntity.class);
         WebSocketSession session = userSessionRepository.getSession(onlineMessageEntity.getTo());
         if (session == null) {
-            try{
-                offlineMessageApiClient.produceMessage(offlineMessageConverter.getOfflineMessage(onlineMessageEntity));
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+//            try{
+//                offlineMessageApiClient.produceMessage(offlineMessageConverter.getOfflineMessage(onlineMessageEntity));
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
         }else{
             JFMSServerSendMessage jfmsServerSendMessage = onlineMessageConverter.getJFMSReceiveMessage(onlineMessageEntity);
             try {
@@ -47,11 +47,9 @@ public class OnlineMessageListener extends JedisPubSub {
     }
 
     public void init(OnlineMessageConverter onlineMessageConverter,
-                     OfflineMessageConverter offlineMessageConverter,
-                     OfflineMessageApiClient offlineMessageApiClient,
                      UserSessionRepository userSessionRepository) {
-        this.offlineMessageConverter = offlineMessageConverter;
-        this.offlineMessageApiClient = offlineMessageApiClient;
+//        this.offlineMessageConverter = offlineMessageConverter;
+//        this.offlineMessageApiClient = offlineMessageApiClient;
         this.onlineMessageConverter = onlineMessageConverter;
         this.userSessionRepository = userSessionRepository;
     }
