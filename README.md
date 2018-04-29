@@ -19,6 +19,16 @@ port number is `7070`.
 | `POST` | `offline/produce` | {`id`, `from`, `to`, `body`, `subject`, `sendTime`} | --- | --- | Saves `OfflineMessage` into message broker |
 | `POST` | `offline/consume/{messageOwner}` | --- |  |  [{`id`, `from`, `to`, `body`, `subject`, `sendTime`}]  | returns list of `OfflineMessage` belongs to `messageOwner` |
 
+## message-history
+port number is `7080`.
+
+| Method | URL | Body | Header | Return value | description |
+| --- | --- | --- | --- | --- | -- |
+| `POST` | `history/p2p/{userId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | saves `P2PMessage` |
+| `PUT` | `history/p2p/{userId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | change status of seved message to updated and insert a field into `P2PUpdateEntity`. |
+| `POST` | `history/p2p/{userId}/{rouster}` | {`pageNumber`, `pageSize`} | --- | [{`messageId`, `sender`, `body`, `subject`, `time`} , ...] | returns `pageSize` number of `P2PMessages` from reord multiple  of `pageNumber` and `pageSize` |
+| `DELETE` | `history/p2p/{userId}` | [`messageId`, ...] | --- | --- | change status of saved message to deleted. |
+
 ## engine
 websocket port number is `4042`.
 
