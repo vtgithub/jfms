@@ -1,4 +1,4 @@
-package com.jfms.engine.service.biz.remote.api;
+package com.jfms.engine.service.biz.remote.helper;
 
 import com.jfms.offline_message.model.OfflineMessage;
 

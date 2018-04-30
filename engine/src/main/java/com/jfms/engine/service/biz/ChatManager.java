@@ -7,6 +7,8 @@ import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.remote.OnlineMessageConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
+import com.jfms.engine.service.biz.remote.helper.HistoryMessageProducer;
+import com.jfms.engine.service.biz.remote.helper.OfflineMessageProducer;
 import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
 import com.jfms.offline_message.model.OfflineMessage;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,6 +18,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,15 +44,16 @@ public class ChatManager implements InitializingBean {
     OnlineMessageListener onlineMessageListener;
     @Autowired
     OfflineMessageApiClient offlineMessageApiClient;
-
+    @Autowired
+    MessageHistoryApiClient messageHistoryApiClient;
     Gson gson = new Gson();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         onlineMessageListener.init(
                 onlineMessageConverter,
-                userSessionRepository);
-
+                userSessionRepository
+        );
         onlineMessageRepository.setMessageListener(onlineMessageListener);
     }
 
@@ -92,7 +96,8 @@ public class ChatManager implements InitializingBean {
             e.printStackTrace();
             //todo log
         }
-        //todo save in message history
+        P2PMessage p2PMessage = HistoryMessageProducer.getP2PMessage(messageId, jfmsClientSendMessage);
+        messageHistoryApiClient.saveHistoryMessage(jfmsClientSendMessage.getTo(), p2PMessage);
     }
 
     public void editMessage(JFMSClientEditMessage jfmsClientEditMessage) {
@@ -114,7 +119,8 @@ public class ChatManager implements InitializingBean {
                 //todo log
             }
         }
-        //todo edit in message history
+        P2PMessage p2PMessage = HistoryMessageProducer.getP2PMessage(jfmsClientEditMessage);
+        messageHistoryApiClient.UpdateHistoryMessage(jfmsClientEditMessage.getTo(), p2PMessage);
     }
 
     public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage) {
@@ -136,7 +142,11 @@ public class ChatManager implements InitializingBean {
                 //todo log
             }
         }
-        //todo delete from history
+
+        messageHistoryApiClient.deleteP2PMessage(
+                jfmsClientDeleteMessage.getTo(),
+                Arrays.asList(jfmsClientDeleteMessage.getId())
+        );
     }
 
     public void sendIsTypingMessage(JFMSClientIsTypingMessage jfmsClientIsTypingMessage) {
