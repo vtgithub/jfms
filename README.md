@@ -16,8 +16,8 @@ port number is `7070`.
 
 | Method | URL | Body | Header | Return value | description |
 | --- | --- | --- | --- | --- | -- |
-| `POST` | `offline/produce` | {`id`, `from`, `to`, `body`, `subject`, `sendTime`} | --- | --- | Saves `OfflineMessage` into message broker |
-| `POST` | `offline/consume/{messageOwner}` | --- |  |  [{`id`, `from`, `to`, `body`, `subject`, `sendTime`}]  | returns list of `OfflineMessage` belongs to `messageOwner` |
+| `POST` | `offline/produce` | {`owner`, `message`} | --- | --- | Saves `OfflineMessage` into message broker |
+| `POST` | `offline/consume/{messageOwner}` | --- |  |  [`message`,...]  | returns list of `OfflineMessage` belongs to `messageOwner` |
 
 ## message-history
 port number is `7080`.
