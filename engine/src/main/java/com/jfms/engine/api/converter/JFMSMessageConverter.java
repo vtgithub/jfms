@@ -57,4 +57,14 @@ public class JFMSMessageConverter {
                 jfmsClientSeenMessage.getFrom()
         );
     }
+
+    public JFMSServerSendMessage clientSendToServerSend(String messageId, JFMSClientSendMessage jfmsClientSendMessage) {
+        return new JFMSServerSendMessage(
+                messageId,
+                jfmsClientSendMessage.getFrom(),
+                jfmsClientSendMessage.getBody(),
+                jfmsClientSendMessage.getSubject(),
+                jfmsClientSendMessage.getSendTime()
+        );
+    }
 }

@@ -1,11 +1,14 @@
 package com.jfms.engine.api.model;
 
+import com.jfms.engine.api.Method;
+
 import java.util.UUID;
 
 /**
  * Created by vahid on 4/4/18.
  */
 public class JFMSServerSendMessage {
+    private Integer method;
     private String id;
     private String from;
     private String body;
@@ -14,6 +17,7 @@ public class JFMSServerSendMessage {
 
 
     public JFMSServerSendMessage(String id, String from, String body, String subject, Long sendTime) {
+        this.method = Method.SEND.getValue();
         this.id = id;
         this.from = from;
         this.body = body;
@@ -22,6 +26,14 @@ public class JFMSServerSendMessage {
     }
 
     public JFMSServerSendMessage() {
+    }
+
+    public Integer getMethod() {
+        return method;
+    }
+
+    public void setMethod(Integer method) {
+        this.method = method;
     }
 
     public String getFrom() {

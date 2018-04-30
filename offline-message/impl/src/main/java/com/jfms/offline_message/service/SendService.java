@@ -11,10 +11,10 @@ public class SendService {
 
   @Autowired
   private KafkaTemplate<String, String> kafkaTemplate;
-  private Gson gson = new Gson();
 
   public void send(String topic, OfflineMessage offlineMessage) {
-    System.out.println("message sent from "+ offlineMessage.getFrom() + " to " + offlineMessage.getTo());
-    kafkaTemplate.send(topic, gson.toJson(offlineMessage));
+    System.out.println("message saved for "+ offlineMessage.getOwner());
+    //todo log
+    kafkaTemplate.send(topic, offlineMessage.getMessage());
   }
 }

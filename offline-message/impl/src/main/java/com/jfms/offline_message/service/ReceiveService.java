@@ -5,6 +5,7 @@ import com.jfms.offline_message.model.OfflineMessage;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
@@ -44,13 +45,13 @@ public class ReceiveService {
 
     }
 
-    public List<OfflineMessage> receive(String topic){
+    public List<String> receive(String topic){
         kafkaListenerEndpointRegistry.stop();
-        List<OfflineMessage> offlineMessageInJsonList = new ArrayList<>();
+        List<String> offlineMessageInJsonList = new ArrayList<>();
         receiver.subscribe(Arrays.asList(topic));
         ConsumerRecords<String, String> messageRecords = receiver.poll(0);
         for (ConsumerRecord<String, String> messageRecord: messageRecords){
-            offlineMessageInJsonList.add(gson.fromJson(messageRecord.value(), OfflineMessage.class));
+            offlineMessageInJsonList.add(messageRecord.value());
         }
         return offlineMessageInJsonList;
     }

@@ -1,17 +1,14 @@
 package com.jfms.offline_message.api;
 
-import com.google.gson.Gson;
 import com.jfms.offline_message.OfflineMessageApi;
 import com.jfms.offline_message.model.OfflineMessage;
 import com.jfms.offline_message.service.ReceiveService;
 import com.jfms.offline_message.service.SendService;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -29,13 +26,13 @@ public class OfflineMessageApiImpl implements OfflineMessageApi{
 
 //    @RequestMapping(value = "/produce", method = RequestMethod.POST)
     public @ResponseBody void produceMessage(@RequestBody OfflineMessage offlineMessage){
-        sendService.send(offlineMessage.getTo(), offlineMessage);
+        sendService.send(offlineMessage.getOwner(), offlineMessage);
 
     }
 
 //    @RequestMapping(value = "/consume/{messageOwner}", method = RequestMethod.GET)
-    public @ResponseBody List<OfflineMessage> consumeMessage(@PathVariable("messageOwner") String messageOwner){
-            List<OfflineMessage> messageList = receiveService.receive(messageOwner);
+    public @ResponseBody List<String> consumeMessage(@PathVariable("messageOwner") String messageOwner){
+            List<String> messageList = receiveService.receive(messageOwner);
         return messageList;
     }
 }

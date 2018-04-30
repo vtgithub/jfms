@@ -15,13 +15,13 @@ public class LastSeenRepositoryRedisImpl implements LastSeenRepository{
     }
 
     @Override
-    public void setLastSeen(String room, Long seenTime) {
-        redisDao.hset("last_seen_hash", room, seenTime.toString());
+    public void setLastSeen(String sourceUser, String destinationUser, Long seenTime) {
+        redisDao.hset("last_seen_map", sourceUser+destinationUser, seenTime.toString());
     }
 
     @Override
-    public Long getLastSeen(String room) {
-        String lastSeenTime = redisDao.hget("last_seen_hash", room);
+    public Long getLastSeen(String sourceUser, String destinationUser) {
+        String lastSeenTime = redisDao.hget("last_seen_map", destinationUser+sourceUser);
         return Long.parseLong(lastSeenTime);
     }
 
