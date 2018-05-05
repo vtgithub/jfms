@@ -25,16 +25,13 @@ public class MessageConverter {
         return p2PEntity;
     }
 
-    public P2PEntity p2PMessageToP2pEntity(P2PMessage messageForHistory, P2PEntity previousP2PEntity) {
-        if (messageForHistory == null)
-            return null;
+    public void p2PMessageToP2pEntity(P2PMessage messageForHistory, P2PEntity previousP2PEntity) {
         previousP2PEntity.setBody(messageForHistory.getBody());
 //        previousP2PEntity.setFrom(messageForHistory.getFrom());
 //        previousP2PEntity.setMessageId(messageForHistory.getMessageId());
         previousP2PEntity.setSubject(messageForHistory.getSubject());
 //        previousP2PEntity.setTime(messageForHistory.getTime());
         previousP2PEntity.setStatus(EntityStatus.UPDATED.getValue());
-        return previousP2PEntity;
     }
 
     public List<P2PMessage> p2PEntityListToP2PMessageList(List<P2PEntity> p2PEntityList) {

@@ -36,15 +36,16 @@ public class P2PService {
     public void editMessage(String userId, P2PMessage messageForUpdate) {
         P2PEntity previousP2PEntity = p2PDao.findByOwnerAndMessageIdAndStatusGreaterThanEqualAndStatusLessThanEqual(
                 userId, messageForUpdate.getMessageId(), 1, 2);
+        if (previousP2PEntity.getStatus() == EntityStatus.DELETED.getValue())
+            return;
+        messageConverter.p2PMessageToP2pEntity(messageForUpdate, previousP2PEntity);
+        p2PDao.save(previousP2PEntity);
+
         String previousValue = previousP2PEntity.getBody();
-        P2PEntity newP2PEntity = messageConverter.p2PMessageToP2pEntity(messageForUpdate, previousP2PEntity);
-        if (previousP2PEntity.getStatus() == EntityStatus.INSERTED.getValue()){
-            p2PDao.save(newP2PEntity);
-        }
         P2PUpdateEntity p2PUpdateEntity = dalAssistant.getP2PUpdateEntityFromP2PEntity(
                 previousValue,
                 messageForUpdate.getTime(),
-                newP2PEntity
+                previousP2PEntity
         );
         p2PUpdateDao.save(p2PUpdateEntity);
     }

@@ -1,8 +1,8 @@
 package com.jfms.engine.service.biz.remote.helper;
 
-import com.jfms.engine.api.model.JFMSClientDeleteMessage;
 import com.jfms.engine.api.model.JFMSClientEditMessage;
 import com.jfms.engine.api.model.JFMSClientSendMessage;
+import com.jfms.message_history.model.P2PMessage;
 
 public class HistoryMessageProducer {
     public static P2PMessage getP2PMessage(String messageId, JFMSClientSendMessage jfmsClientSendMessage){
@@ -17,7 +17,7 @@ public class HistoryMessageProducer {
 
     public static P2PMessage getP2PMessage(JFMSClientEditMessage jfmsClientEditMessage) {
         P2PMessage p2PMessage = new P2PMessage();
-        p2PMessage.setMessageIId(jfmsClientEditMessage.getId());
+        p2PMessage.setMessageId(jfmsClientEditMessage.getId());
         p2PMessage.setSender(jfmsClientEditMessage.getFrom());
         p2PMessage.setBody(jfmsClientEditMessage.getBody());
         p2PMessage.setSubject(jfmsClientEditMessage.getSubject());

@@ -10,6 +10,7 @@ import com.jfms.engine.service.biz.remote.api.*;
 import com.jfms.engine.service.biz.remote.helper.HistoryMessageProducer;
 import com.jfms.engine.service.biz.remote.helper.OfflineMessageProducer;
 import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
+import com.jfms.message_history.model.P2PMessage;
 import com.jfms.offline_message.model.OfflineMessage;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

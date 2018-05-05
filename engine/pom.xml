@@ -27,22 +27,9 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.jfms.offline-message</groupId>
-			<artifactId>api</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jfms.message-history</groupId>
-			<artifactId>api</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-
-
-		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -128,6 +115,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
+			<version>LATEST</version>
 		</dependency>
 
 		<!--&lt;!&ndash; feign &ndash;&gt;-->
@@ -146,17 +134,27 @@
 			<!--<artifactId>feign-slf4j</artifactId>-->
 			<!--<version>9.3.1</version>-->
 		<!--</dependency>-->
+		<dependency>
+			<groupId>com.jfms.offline-message</groupId>
+			<artifactId>api</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jfms.message-history</groupId>
+			<artifactId>api</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+	<!--<build>-->
+		<!--<plugins>-->
+			<!--<plugin>-->
+				<!--<groupId>org.springframework.boot</groupId>-->
+				<!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+			<!--</plugin>-->
+		<!--</plugins>-->
+	<!--</build>-->
 
 
 </project>
