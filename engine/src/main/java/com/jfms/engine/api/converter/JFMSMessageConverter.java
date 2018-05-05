@@ -1,5 +1,6 @@
 package com.jfms.engine.api.converter;
 
+import com.jfms.engine.api.Method;
 import com.jfms.engine.api.model.*;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +44,7 @@ public class JFMSMessageConverter {
         if (jfmsClientConversationLeaveMessage == null)
             return null;
         return new JFMSServerConversationMessage(
+                Method.CONVERSATION_LEAVE.getValue(),
                 jfmsClientConversationLeaveMessage.getFrom(),
                 jfmsClientConversationLeaveMessage.getLeaveTime()
         );

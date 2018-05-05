@@ -1,15 +1,27 @@
 package com.jfms.engine.api.model;
 
+import com.jfms.engine.api.Method;
+
 public class JFMSServerConversationMessage {
+    private Integer method;
     private String from;
     private Long leaveTime;
 
-    public JFMSServerConversationMessage(String from, Long leaveTime) {
+    public JFMSServerConversationMessage(Integer conversationType, String from, Long leaveTime) {
+        this.method = conversationType;
         this.from = from;
         this.leaveTime = leaveTime;
     }
 
     public JFMSServerConversationMessage() {
+    }
+
+    public Integer getMethod() {
+        return method;
+    }
+
+    public void setMethod(Integer method) {
+        this.method = method;
     }
 
     public String getFrom() {

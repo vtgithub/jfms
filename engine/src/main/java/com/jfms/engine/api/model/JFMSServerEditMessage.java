@@ -1,5 +1,7 @@
 package com.jfms.engine.api.model;
 
+import com.jfms.engine.api.Method;
+
 /**
  * Created by vahid on 4/4/18.
  */
@@ -10,9 +12,11 @@ public class JFMSServerEditMessage {
     private String body;
     private String subject;
     private Long editTime;
+    private Integer method;
 
 
     public JFMSServerEditMessage(String id, String from, String body, String subject, Long editTime) {
+        this.method = Method.EDIT.getValue();
         this.id = id;
         this.from = from;
         this.body = body;
@@ -61,5 +65,13 @@ public class JFMSServerEditMessage {
 
     public void setEditTime(Long editTime) {
         this.editTime = editTime;
+    }
+
+    public Integer getMethod() {
+        return method;
+    }
+
+    public void setMethod(Integer method) {
+        this.method = method;
     }
 }

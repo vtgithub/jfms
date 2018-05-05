@@ -38,10 +38,10 @@ public class P2PService {
                 userId, messageForUpdate.getMessageId(), 1, 2);
         if (previousP2PEntity.getStatus() == EntityStatus.DELETED.getValue())
             return;
+        String previousValue = previousP2PEntity.getBody();
         messageConverter.p2PMessageToP2pEntity(messageForUpdate, previousP2PEntity);
         p2PDao.save(previousP2PEntity);
 
-        String previousValue = previousP2PEntity.getBody();
         P2PUpdateEntity p2PUpdateEntity = dalAssistant.getP2PUpdateEntityFromP2PEntity(
                 previousValue,
                 messageForUpdate.getTime(),

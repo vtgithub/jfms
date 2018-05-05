@@ -1,6 +1,7 @@
 package com.jfms.engine.service.biz;
 
 import com.google.gson.Gson;
+import com.jfms.engine.api.Method;
 import com.jfms.engine.api.converter.JFMSMessageConverter;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
@@ -208,7 +209,11 @@ public class ChatManager implements InitializingBean {
         try {
             session.sendMessage(
                     new TextMessage(
-                        gson.toJson(new JFMSServerConversationMessage(jfmsClientConversationInMessage.getTo(), leaveTime))
+                        gson.toJson(new JFMSServerConversationMessage(
+                                Method.CONVERSATION_LEAVE.getValue(),
+                                jfmsClientConversationInMessage.getTo(),
+                                leaveTime
+                        ))
                     )
             );
         } catch (IOException e) {

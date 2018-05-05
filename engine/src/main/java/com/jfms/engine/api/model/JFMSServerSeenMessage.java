@@ -1,8 +1,12 @@
 package com.jfms.engine.api.model;
 
+import com.jfms.engine.api.Method;
+
 import java.util.List;
 
 public class JFMSServerSeenMessage {
+
+    private Integer method;
     private List<String> messageIdList;
     private Long seenTime;
     private String from;
@@ -11,9 +15,18 @@ public class JFMSServerSeenMessage {
     }
 
     public JFMSServerSeenMessage(List<String> messageIdList, Long seenTime, String from) {
+        this.method = Method.SEEN.getValue();
         this.messageIdList = messageIdList;
         this.seenTime = seenTime;
         this.from = from;
+    }
+
+    public Integer getMethod() {
+        return method;
+    }
+
+    public void setMethod(Integer method) {
+        this.method = method;
     }
 
     public List<String> getMessageIdList() {
