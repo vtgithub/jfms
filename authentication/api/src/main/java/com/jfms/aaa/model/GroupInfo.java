@@ -9,6 +9,17 @@ public class GroupInfo {
     private List<GroupMember> memberList;
     private Integer type;
 
+    public GroupInfo(String id, String displayName, String owner, List<GroupMember> memberList, Integer type) {
+        this.id = id;
+        this.displayName = displayName;
+        this.owner = owner;
+        this.memberList = memberList;
+        this.type = type;
+    }
+
+    public GroupInfo() {
+    }
+
     public String getId() {
         return id;
     }

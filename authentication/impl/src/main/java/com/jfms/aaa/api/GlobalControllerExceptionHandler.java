@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalControllerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public void simpleLog(){
-        System.out.println("exception has been occured");
+    public void simpleLog(Exception e){
+        e.printStackTrace();
+//        System.out.println("exception has been occured");
     }
 }

@@ -1,19 +1,25 @@
 package com.jfms.aaa.dal.entity;
 
-import javax.persistence.*;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "user_entity")
+
+//@Entity
+//@Table(name = "user_entity")
+@Document(collection = "user_entity")
 public class UserEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+    private ObjectId id;
 
-    @Column(unique = true)
+//    @Column(unique = true)
+    @Indexed
     private String mobileNumber;
-    @Column
+//    @Column
     private String firstName;
-    @Column
+//    @Column
     private String lastName;
 
 //    protected UserEntity(){}
@@ -24,11 +30,11 @@ public class UserEntity {
         this.lastName = lastName;
     }
 
-    public Long getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 

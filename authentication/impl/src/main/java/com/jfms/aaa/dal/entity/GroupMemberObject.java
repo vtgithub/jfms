@@ -1,16 +1,17 @@
-package com.jfms.aaa.model;
+package com.jfms.aaa.dal.entity;
 
+import java.io.Serializable;
 
-public class GroupMember {
+public class GroupMemberObject implements Serializable{
     private String userName;
     private Boolean isAdmin;
 
-    public GroupMember(String userName, Boolean isAdmin) {
+    public GroupMemberObject(String userName, Boolean isAdmin) {
         this.userName = userName;
         this.isAdmin = isAdmin;
     }
 
-    public GroupMember() {
+    public GroupMemberObject() {
     }
 
     public String getUserName() {
@@ -21,11 +22,11 @@ public class GroupMember {
         this.userName = userName;
     }
 
-    public Boolean isAdmin() {
+    public Boolean getAdmin() {
         return isAdmin;
     }
 
-    public void setIsAdmin(Boolean admin) {
+    public void setAdmin(Boolean admin) {
         isAdmin = admin;
     }
 }

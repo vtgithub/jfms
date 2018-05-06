@@ -23,7 +23,8 @@ public class AuthenticationService {
         if (
                 uri.contains("aaa/user/register") ||
                 uri.contains("aaa/user/activate") ||
-                uri.contains("aaa/user/reactivate")
+                uri.contains("aaa/user/reactivate") ||
+                uri.contains("aaa/group")
            ){
 
             return true;
