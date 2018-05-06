@@ -22,7 +22,7 @@ public class GroupConverter {
     }
 
     public GroupMemberObject getMemberObject(GroupMember groupMember){
-        return new GroupMemberObject(groupMember.getUserName(), groupMember.isAdmin());
+        return new GroupMemberObject(groupMember.getUserName(), groupMember.getAdmin());
     }
 
     public List<GroupMemberObject> getMemberObjectList(List<GroupMember> groupMemberList){

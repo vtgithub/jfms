@@ -1,12 +1,12 @@
-package com.jfms.engine.service.biz.remote.helper;
-
-import com.jfms.offline_message.model.OfflineMessage;
-
-public class OfflineMessageProducer {
-    public static OfflineMessage getOfflineMessage(String owner, String message){
-        OfflineMessage offlineMessage = new OfflineMessage();
-        offlineMessage.setOwner(owner);
-        offlineMessage.setMessage(message);
-        return offlineMessage;
-    }
-}
+//package com.jfms.engine.service.biz.remote.helper;
+//
+//import com.jfms.offline_message.model.OfflineMessage;
+//
+//public class OfflineMessageProducer {
+//    public static OfflineMessage getOfflineMessage(String owner, String message){
+//        OfflineMessage offlineMessage = new OfflineMessage();
+//        offlineMessage.setOwner(owner);
+//        offlineMessage.setMessage(message);
+//        return offlineMessage;
+//    }
+//}

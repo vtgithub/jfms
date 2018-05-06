@@ -69,4 +69,17 @@ public class JFMSMessageConverter {
                 jfmsClientSendMessage.getSendTime()
         );
     }
+
+    public JFMSServerGroupCreationMessage clientGroupCreationToServerGroupCreation(
+            String groupId, JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage) {
+        return new JFMSServerGroupCreationMessage(
+                groupId,
+                Method.GROUP_CREATION.getValue(),
+                jfmsClientGroupCreationMessage.getDisplayName(),
+                jfmsClientGroupCreationMessage.getCreator(),
+                jfmsClientGroupCreationMessage.getJfmsGroupMemberMap(),
+                jfmsClientGroupCreationMessage.getType()
+        );
+
+    }
 }

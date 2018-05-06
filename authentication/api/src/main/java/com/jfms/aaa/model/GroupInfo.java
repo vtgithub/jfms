@@ -17,6 +17,13 @@ public class GroupInfo {
         this.type = type;
     }
 
+    public GroupInfo(String displayName, String owner, List<GroupMember> memberList, Integer type) {
+        this.displayName = displayName;
+        this.owner = owner;
+        this.memberList = memberList;
+        this.type = type;
+    }
+
     public GroupInfo() {
     }
 

@@ -9,7 +9,8 @@ public enum Method {
     PING(6),
     CONVERSATION_LEAVE(7),
     CONVERSATION_IN(8),
-    SEEN(9);
+    SEEN(9),
+    GROUP_CREATION(10);
 
     private int value;
 

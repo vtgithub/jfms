@@ -3,11 +3,11 @@ package com.jfms.aaa.model;
 
 public class GroupMember {
     private String userName;
-    private Boolean isAdmin;
+    private Boolean admin;
 
-    public GroupMember(String userName, Boolean isAdmin) {
+    public GroupMember(String userName, Boolean admin) {
         this.userName = userName;
-        this.isAdmin = isAdmin;
+        this.admin = admin;
     }
 
     public GroupMember() {
@@ -21,11 +21,11 @@ public class GroupMember {
         this.userName = userName;
     }
 
-    public Boolean isAdmin() {
-        return isAdmin;
+    public Boolean getAdmin() {
+        return admin;
     }
 
-    public void setIsAdmin(Boolean admin) {
-        isAdmin = admin;
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
     }
 }

@@ -1,15 +1,16 @@
 package com.jfms.engine.service.biz;
 
 import com.google.gson.Gson;
+import com.jfms.aaa.model.GroupInfo;
 import com.jfms.engine.api.Method;
 import com.jfms.engine.api.converter.JFMSMessageConverter;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
+import com.jfms.engine.service.biz.remote.GroupConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
-import com.jfms.engine.service.biz.remote.helper.HistoryMessageProducer;
-import com.jfms.engine.service.biz.remote.helper.OfflineMessageProducer;
+import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;
 import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
 import com.jfms.message_history.model.P2PMessage;
 import com.jfms.offline_message.model.OfflineMessage;
@@ -20,9 +21,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by vahid on 4/3/18.
@@ -48,6 +47,12 @@ public class ChatManager implements InitializingBean {
     OfflineMessageApiClient offlineMessageApiClient;
     @Autowired
     MessageHistoryApiClient messageHistoryApiClient;
+    @Autowired
+    GroupApiClient groupApiClient;
+    @Autowired
+    GroupRepository groupRepository;
+    @Autowired
+    GroupConverter groupConverter;
     Gson gson = new Gson();
 
     @Override
@@ -78,7 +83,7 @@ public class ChatManager implements InitializingBean {
         String messageId = UUID.randomUUID().toString();
         String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientSendMessage.getTo());
         if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageProducer.getOfflineMessage(
+            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
                     jfmsClientSendMessage.getTo(),
                     gson.toJson(jfmsMessageConverter.clientSendToServerSend(messageId, jfmsClientSendMessage))
             );
@@ -98,7 +103,13 @@ public class ChatManager implements InitializingBean {
             e.printStackTrace();
             //todo log
         }
-        P2PMessage p2PMessage = HistoryMessageProducer.getP2PMessage(messageId, jfmsClientSendMessage);
+        P2PMessage p2PMessage = MessageHistoryApiClient.getP2PMessage(
+                messageId,
+                jfmsClientSendMessage.getFrom(),
+                jfmsClientSendMessage.getBody(),
+                jfmsClientSendMessage.getSubject(),
+                jfmsClientSendMessage.getSendTime()
+        );
         messageHistoryApiClient.saveHistoryMessage(jfmsClientSendMessage.getTo(), p2PMessage);
     }
 
@@ -107,7 +118,7 @@ public class ChatManager implements InitializingBean {
                 jfmsMessageConverter.clientEditToServerEdit(jfmsClientEditMessage);
         String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientEditMessage.getTo());
         if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageProducer.getOfflineMessage(
+            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
                     jfmsClientEditMessage.getTo(),
                     gson.toJson(jfmsServerEditMessage)
             );
@@ -121,7 +132,13 @@ public class ChatManager implements InitializingBean {
                 //todo log
             }
         }
-        P2PMessage p2PMessage = HistoryMessageProducer.getP2PMessage(jfmsClientEditMessage);
+        P2PMessage p2PMessage = MessageHistoryApiClient.getP2PMessage(
+                jfmsClientEditMessage.getId(),
+                jfmsClientEditMessage.getFrom(),
+                jfmsClientEditMessage.getBody(),
+                jfmsClientEditMessage.getSubject(),
+                jfmsClientEditMessage.getEditTime()
+        );
         messageHistoryApiClient.UpdateHistoryMessage(jfmsClientEditMessage.getTo(), p2PMessage);
     }
 
@@ -130,7 +147,7 @@ public class ChatManager implements InitializingBean {
                 jfmsMessageConverter.clientDeleteToServerDelete(jfmsClientDeleteMessage);
         String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientDeleteMessage.getTo());
         if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageProducer.getOfflineMessage(
+            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
                     jfmsClientDeleteMessage.getTo(),
                     gson.toJson(jfmsServerDeleteMessage)
             );
@@ -184,7 +201,7 @@ public class ChatManager implements InitializingBean {
                 jfmsMessageConverter.clientConversationLeaveToServerConversation(jfmsClientConversationLeaveMessage);
         String receiverStatus = presenceRepository.getPresenceStatus(jfmsClientConversationLeaveMessage.getTo());
         if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageProducer.getOfflineMessage(
+            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
                     jfmsClientConversationLeaveMessage.getTo(),
                     gson.toJson(jfmsServerConversationMessage)
             );
@@ -239,8 +256,50 @@ public class ChatManager implements InitializingBean {
 
     }
 
+    public void createGroup(JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage, WebSocketSession session) {
+        GroupInfo groupInfo = GroupApiClient.getGroupInfo(
+            jfmsClientGroupCreationMessage.getDisplayName(),
+                jfmsClientGroupCreationMessage.getCreator(),
+                jfmsClientGroupCreationMessage.getJfmsGroupMemberMap(),
+                jfmsClientGroupCreationMessage.getType()
+        );
+        String groupId = groupApiClient.addGroup(groupInfo);
+        GroupInfoEntity groupInfoEntity = groupConverter.getEntityFromJFMSMessage(jfmsClientGroupCreationMessage);
+        groupRepository.saveGroupInfo(groupId, groupInfoEntity);
+        sendGroupCreationMessageToMembers(
+                jfmsMessageConverter.clientGroupCreationToServerGroupCreation(groupId, jfmsClientGroupCreationMessage)
+        );
+        try {
+            session.sendMessage(new TextMessage(groupId));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+    }
+
 
     //---------------------------------
+
+    private void sendGroupCreationMessageToMembers(JFMSServerGroupCreationMessage jfmsServerGroupCreationMessage) {
+        Iterator<Map.Entry<String, Boolean>> memberIterator = jfmsServerGroupCreationMessage.getJfmsGroupMemberMap().entrySet().iterator();
+        while (memberIterator.hasNext()){
+            Map.Entry<String, Boolean> member = memberIterator.next();
+            String memberPresenceStatus = presenceRepository.getPresenceStatus(member.getKey());
+            if (memberPresenceStatus == null || memberPresenceStatus.equals("offline")){
+                OfflineMessage offlineMessage =
+                        OfflineMessageApiClient.getOfflineMessage(member.getKey(), gson.toJson(jfmsServerGroupCreationMessage));
+                offlineMessageApiClient.produceMessage(offlineMessage);
+            }else {
+                WebSocketSession userSession = userSessionRepository.getSession(member.getKey());
+                try {
+                    userSession.sendMessage(new TextMessage(gson.toJson(jfmsServerGroupCreationMessage)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //todo log
+                }
+            }
+        }
+    }
 
     public String getChannelName(String from, String to){
         if (from.compareTo(to) >= 0)
