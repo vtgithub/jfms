@@ -59,6 +59,10 @@ public class ChatManagerService {
             JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage =
                     gson.fromJson(messageInJson, JFMSClientGroupCreationMessage.class);
             chatManager.createGroup(jfmsClientGroupCreationMessage, session);
+        } else if (methodNo == Method.GROUP_SEND.getValue()){
+            JFMSClientSendMessage jfmsClientGroupSendMessage =
+                    gson.fromJson(messageInJson, JFMSClientSendMessage.class);
+            chatManager.sendGroupMessage(jfmsClientGroupSendMessage, session);
         }
     }
 

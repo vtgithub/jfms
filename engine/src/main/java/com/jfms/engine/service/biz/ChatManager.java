@@ -116,22 +116,9 @@ public class ChatManager implements InitializingBean {
     public void editMessage(JFMSClientEditMessage jfmsClientEditMessage) {
         JFMSServerEditMessage jfmsServerEditMessage =
                 jfmsMessageConverter.clientEditToServerEdit(jfmsClientEditMessage);
-        String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientEditMessage.getTo());
-        if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
-                    jfmsClientEditMessage.getTo(),
-                    gson.toJson(jfmsServerEditMessage)
-            );
-            offlineMessageApiClient.produceMessage(offlineMessage);
-        }else{
-            WebSocketSession receiverSession = userSessionRepository.getSession(jfmsClientEditMessage.getTo());
-            try {
-                receiverSession.sendMessage(new TextMessage(gson.toJson(jfmsServerEditMessage)));
-            } catch (IOException e) {
-                e.printStackTrace();
-                //todo log
-            }
-        }
+
+        sendOnlineOrOffline(jfmsClientEditMessage.getTo(), gson.toJson(jfmsServerEditMessage));
+
         P2PMessage p2PMessage = MessageHistoryApiClient.getP2PMessage(
                 jfmsClientEditMessage.getId(),
                 jfmsClientEditMessage.getFrom(),
@@ -145,22 +132,8 @@ public class ChatManager implements InitializingBean {
     public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage) {
         JFMSServerDeleteMessage jfmsServerDeleteMessage =
                 jfmsMessageConverter.clientDeleteToServerDelete(jfmsClientDeleteMessage);
-        String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientDeleteMessage.getTo());
-        if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
-                    jfmsClientDeleteMessage.getTo(),
-                    gson.toJson(jfmsServerDeleteMessage)
-            );
-            offlineMessageApiClient.produceMessage(offlineMessage);
-        }else {
-            WebSocketSession session = userSessionRepository.getSession(jfmsClientDeleteMessage.getTo());
-            try {
-                session.sendMessage(new TextMessage(gson.toJson(jfmsServerDeleteMessage)));
-            } catch (IOException e) {
-                e.printStackTrace();
-                //todo log
-            }
-        }
+
+        sendOnlineOrOffline(jfmsClientDeleteMessage.getTo(), gson.toJson(jfmsServerDeleteMessage));
 
         messageHistoryApiClient.deleteP2PMessage(
                 jfmsClientDeleteMessage.getTo(),
@@ -199,22 +172,7 @@ public class ChatManager implements InitializingBean {
         );
         JFMSServerConversationMessage jfmsServerConversationMessage =
                 jfmsMessageConverter.clientConversationLeaveToServerConversation(jfmsClientConversationLeaveMessage);
-        String receiverStatus = presenceRepository.getPresenceStatus(jfmsClientConversationLeaveMessage.getTo());
-        if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
-                    jfmsClientConversationLeaveMessage.getTo(),
-                    gson.toJson(jfmsServerConversationMessage)
-            );
-            offlineMessageApiClient.produceMessage(offlineMessage);
-        }else {
-            WebSocketSession session = userSessionRepository.getSession(jfmsClientConversationLeaveMessage.getTo());
-            try {
-                session.sendMessage(new TextMessage(gson.toJson(jfmsServerConversationMessage)));
-            } catch (IOException e) {
-                e.printStackTrace();
-                //todo log
-            }
-        }
+        sendOnlineOrOffline(jfmsClientConversationLeaveMessage.getTo(), gson.toJson(jfmsServerConversationMessage));
 
     }
 
@@ -277,6 +235,9 @@ public class ChatManager implements InitializingBean {
         }
     }
 
+    public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
+        fdf//todo impl
+    }
 
     //---------------------------------
 
@@ -284,22 +245,28 @@ public class ChatManager implements InitializingBean {
         Iterator<Map.Entry<String, Boolean>> memberIterator = jfmsServerGroupCreationMessage.getJfmsGroupMemberMap().entrySet().iterator();
         while (memberIterator.hasNext()){
             Map.Entry<String, Boolean> member = memberIterator.next();
-            String memberPresenceStatus = presenceRepository.getPresenceStatus(member.getKey());
-            if (memberPresenceStatus == null || memberPresenceStatus.equals("offline")){
-                OfflineMessage offlineMessage =
-                        OfflineMessageApiClient.getOfflineMessage(member.getKey(), gson.toJson(jfmsServerGroupCreationMessage));
-                offlineMessageApiClient.produceMessage(offlineMessage);
-            }else {
-                WebSocketSession userSession = userSessionRepository.getSession(member.getKey());
-                try {
-                    userSession.sendMessage(new TextMessage(gson.toJson(jfmsServerGroupCreationMessage)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    //todo log
-                }
+            sendOnlineOrOffline(member.getKey(), gson.toJson(jfmsServerGroupCreationMessage));
+
+        }
+    }
+
+    private void sendOnlineOrOffline(String user, String message) {
+        String memberPresenceStatus = presenceRepository.getPresenceStatus(user);
+        if (memberPresenceStatus == null || memberPresenceStatus.equals("offline")){
+            OfflineMessage offlineMessage =
+                    OfflineMessageApiClient.getOfflineMessage(user, message);
+            offlineMessageApiClient.produceMessage(offlineMessage);
+        }else {
+            WebSocketSession userSession = userSessionRepository.getSession(user);
+            try {
+                userSession.sendMessage(new TextMessage(message));
+            } catch (IOException e) {
+                e.printStackTrace();
+                //todo log
             }
         }
     }
+
 
     public String getChannelName(String from, String to){
         if (from.compareTo(to) >= 0)
