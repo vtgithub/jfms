@@ -24,5 +24,17 @@ public interface GroupApiClient extends GroupApi{
         }
         return new GroupInfo(displayName, owner, groupMemberList, type);
     }
+    static GroupInfo getGroupInfo(String id, String displayName, String owner, Map<String, Boolean> memberMap, Integer type){
+
+        List<GroupMember> groupMemberList = new ArrayList<>();
+        Iterator<Map.Entry<String, Boolean>> memberMapIterator = memberMap.entrySet().iterator();
+        while (memberMapIterator.hasNext()){
+            Map.Entry<String, Boolean> member = memberMapIterator.next();
+            groupMemberList.add(new GroupMember(member.getKey(), member.getValue()));
+        }
+        GroupInfo groupInfo = new GroupInfo(displayName, owner, groupMemberList, type);
+        groupInfo.setId(id);
+        return groupInfo;
+    }
 
 }

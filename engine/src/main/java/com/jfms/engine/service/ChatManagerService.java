@@ -80,6 +80,10 @@ public class ChatManagerService {
             JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage =
                     gson.fromJson(messageInJson, JFMSClientConversationLeaveMessage.class);
             chatManager.setGroupLeaveTime(jfmsClientConversationLeaveMessage);
+        } else if (methodNo == Method.GROUP_INFO_EDIT.getValue()){
+            JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage =
+                    gson.fromJson(messageInJson, JFMSClientGroupInfoEditMessage.class);
+            chatManager.editGroupInfo(jfmsClientGroupInfoEditMessage);
         }
     }
 

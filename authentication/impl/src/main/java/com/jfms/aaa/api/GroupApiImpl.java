@@ -24,6 +24,11 @@ public class GroupApiImpl implements GroupApi{
         return groupId;
     }
 
+
+    public @ResponseBody void editGroup(GroupInfo groupInfo) {
+        groupService.editGroup(groupInfo);
+    }
+
     public @ResponseBody GroupInfo getGroup(@PathVariable("gId")  String groupId, HttpServletResponse response) {
         GroupInfo groupInfo = null;
         try {

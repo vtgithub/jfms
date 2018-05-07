@@ -36,9 +36,8 @@ public class GroupConverter {
         return groupMemberObjectList;
     }
 
- // ------------------------------------------------
 
-    public GroupInfo getApiInfo(GroupEntity groupEntity) {
+    public GroupInfo getInfo(GroupEntity groupEntity) {
         return new GroupInfo(
                 groupEntity.getId().toString(),
                 groupEntity.getDisplayName(),
@@ -47,6 +46,16 @@ public class GroupConverter {
                 groupEntity.getType()
         );
     }
+
+
+    public void updateEntityByInfo(GroupEntity groupEntity, GroupInfo groupInfo) {
+        groupEntity.setDisplayName(groupInfo.getDisplayName());
+        groupEntity.setOwner(groupInfo.getOwner());
+        groupEntity.setType(groupInfo.getType());
+        groupEntity.setMemberObjectList(getMemberObjectList(groupInfo.getMemberList()));
+    }
+
+    // ------------------------------------------------
 
     public GroupMember getMember(GroupMemberObject groupMemberObject){
         return new GroupMember(groupMemberObject.getUserName(), groupMemberObject.getAdmin());
@@ -60,4 +69,5 @@ public class GroupConverter {
         }
         return groupMemberList;
     }
+
 }

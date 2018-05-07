@@ -88,4 +88,17 @@ public class JFMSMessageConverter {
         );
 
     }
+
+    public JFMSServerGroupCreationMessage clientGroupInfoEditToServerGroupCreation(
+            JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage) {
+        return new JFMSServerGroupCreationMessage(
+                jfmsClientGroupInfoEditMessage.getId(),
+                Method.GROUP_INFO_EDIT.getValue(),
+                jfmsClientGroupInfoEditMessage.getDisplayName(),
+                jfmsClientGroupInfoEditMessage.getCreator(),
+                jfmsClientGroupInfoEditMessage.getJfmsGroupMemberMap(),
+                jfmsClientGroupInfoEditMessage.getType()
+        );
+
+    }
 }

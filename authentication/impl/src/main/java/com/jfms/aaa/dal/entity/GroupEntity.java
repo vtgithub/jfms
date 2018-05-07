@@ -19,6 +19,7 @@ public class GroupEntity {
     private List<GroupMemberObject> memberObjectList;
     private Integer type;
 
+
     public GroupEntity(String displayName, String owner, List<GroupMemberObject> memberObjectList, Integer type) {
         this.displayName = displayName;
         this.owner = owner;

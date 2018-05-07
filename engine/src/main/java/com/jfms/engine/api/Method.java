@@ -15,7 +15,8 @@ public enum Method {
     GROUP_EDIT(12),
     GROUP_DELETE(13),
     GROUP_IS_TYPING(14),
-    GROUP_CONVERSATION_LEAVE(15);
+    GROUP_CONVERSATION_LEAVE(15),
+    GROUP_INFO_EDIT(15);
 
     private int value;
 

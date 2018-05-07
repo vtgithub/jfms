@@ -201,7 +201,7 @@ public class ChatManager implements InitializingBean {
         String groupId = groupApiClient.addGroup(groupInfo);
         GroupInfoEntity groupInfoEntity = groupConverter.getEntityFromJFMSMessage(jfmsClientGroupCreationMessage);
         groupRepository.saveGroupInfo(groupId, groupInfoEntity);
-        sendGroupCreationMessageToMembers(
+        sendGroupCreationOrInfoUpdateMessageToMembers(
                 jfmsMessageConverter.clientGroupCreationToServerGroupCreation(groupId, jfmsClientGroupCreationMessage)
         );
 
@@ -213,6 +213,21 @@ public class ChatManager implements InitializingBean {
             //todo log
         }
     }
+
+    public void editGroupInfo(JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage){
+        GroupInfo groupInfo = GroupApiClient.getGroupInfo(
+                jfmsClientGroupInfoEditMessage.getId(),
+                jfmsClientGroupInfoEditMessage.getDisplayName(),
+                jfmsClientGroupInfoEditMessage.getCreator(),
+                jfmsClientGroupInfoEditMessage.getJfmsGroupMemberMap(),
+                jfmsClientGroupInfoEditMessage.getType()
+        );
+        groupApiClient.editGroup(groupInfo);
+        sendGroupCreationOrInfoUpdateMessageToMembers(
+                jfmsMessageConverter.clientGroupInfoEditToServerGroupCreation(jfmsClientGroupInfoEditMessage)
+        );
+    }
+
 
     public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
 
@@ -284,7 +299,7 @@ public class ChatManager implements InitializingBean {
     }
 
     //---------------------------------
-    private void sendGroupCreationMessageToMembers(JFMSServerGroupCreationMessage jfmsServerGroupCreationMessage) {
+    private void sendGroupCreationOrInfoUpdateMessageToMembers(JFMSServerGroupCreationMessage jfmsServerGroupCreationMessage) {
         Iterator<Map.Entry<String, Boolean>> memberIterator = jfmsServerGroupCreationMessage.getJfmsGroupMemberMap().entrySet().iterator();
         while (memberIterator.hasNext()){
             Map.Entry<String, Boolean> member = memberIterator.next();

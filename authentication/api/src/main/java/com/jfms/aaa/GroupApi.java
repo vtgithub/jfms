@@ -13,6 +13,9 @@ public interface GroupApi {
     @RequestMapping(method = RequestMethod.POST)
     String addGroup(@RequestBody GroupInfo groupInfo);
 
+    @RequestMapping(method = RequestMethod.PUT)
+    void editGroup(@RequestBody GroupInfo groupInfo);
+
     @RequestMapping(path = "/{gId}", method = RequestMethod.GET)
     GroupInfo getGroup(@PathVariable("gId") String groupId, HttpServletResponse response);
 }
