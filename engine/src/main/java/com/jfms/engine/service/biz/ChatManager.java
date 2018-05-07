@@ -189,6 +189,7 @@ public class ChatManager implements InitializingBean {
 //        presenceRepository.setPresenceStatus(jfmsClientLoginMessage.getUserName(), UserStatus.ONLINE.getValue());
 
     }
+    //--------------- group messaging
 
     public void createGroup(JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage, WebSocketSession session) {
         GroupInfo groupInfo = GroupApiClient.getGroupInfo(
@@ -213,7 +214,6 @@ public class ChatManager implements InitializingBean {
         }
     }
 
-    //--------------- group messaging
     public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
 
         String messageId = UUID.randomUUID().toString();

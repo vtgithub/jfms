@@ -3,10 +3,12 @@ package com.jfms.message_history.dal.dao;
 import com.jfms.message_history.dal.entity.P2PEntity;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public interface P2PDao extends CrudRepository<P2PEntity, UUID>{
 //    List<P2PEntity> findByOwnerAndFrom(String userId, String rosterId, Pageable pageable);
 //    P2PEntity findByOwnerAndMessageId(String owner, String messageId);

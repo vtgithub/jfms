@@ -1,6 +1,6 @@
 package com.jfms.message_history.model;
 
-public class P2PMessageRequest {
+public class HistoryMessageRequest {
 
     private Integer pageNumber;
     private Integer pageSize;

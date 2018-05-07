@@ -5,11 +5,10 @@ import org.springframework.data.cassandra.core.mapping.Indexed;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Table
-public class P2PEntity implements Serializable, Comparable<P2PEntity>{
+public class GroupEntity implements Comparable<GroupEntity> {
     @PrimaryKeyColumn(
             name = "id",
             type = PrimaryKeyType.PARTITIONED,
@@ -18,12 +17,12 @@ public class P2PEntity implements Serializable, Comparable<P2PEntity>{
     private UUID _id = UUID.randomUUID();
 
     @PrimaryKeyColumn(
-            name = "owner",
+            name = "groupId",
             type = PrimaryKeyType.PARTITIONED,
             ordinal = 1
     )
     @Indexed
-    private String owner;
+    private String groupId;
     @PrimaryKeyColumn(
             name = "messageId",
             type = PrimaryKeyType.PARTITIONED,
@@ -35,18 +34,13 @@ public class P2PEntity implements Serializable, Comparable<P2PEntity>{
             type = PrimaryKeyType.PARTITIONED,
             ordinal = 3
     )
-        private String sender;
+    private String sender;
     @PrimaryKeyColumn(
             name = "time",
             type = PrimaryKeyType.CLUSTERED,
             ordinal = 4
     )
     private Long time;
-//    @PrimaryKeyColumn(
-//            name = "status",
-//            type = PrimaryKeyType.CLUSTERED,
-//            ordinal = 5
-//    )
     @Indexed
     private Integer status;
     private String body;
@@ -60,12 +54,12 @@ public class P2PEntity implements Serializable, Comparable<P2PEntity>{
         this._id = _id;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     public String getMessageId() {
@@ -84,22 +78,6 @@ public class P2PEntity implements Serializable, Comparable<P2PEntity>{
         this.sender = sender;
     }
 
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
     public Long getTime() {
         return time;
     }
@@ -116,8 +94,24 @@ public class P2PEntity implements Serializable, Comparable<P2PEntity>{
         this.status = status;
     }
 
+    public String getBody() {
+        return body;
+    }
 
-    public int compareTo(P2PEntity o) {
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+
+    public int compareTo(GroupEntity o) {
         return (int) (this.time - o.time);
     }
 }

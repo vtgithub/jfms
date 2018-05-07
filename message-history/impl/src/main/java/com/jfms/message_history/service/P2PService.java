@@ -7,8 +7,8 @@ import com.jfms.message_history.dal.dao.P2PDao;
 import com.jfms.message_history.dal.dao.P2PUpdateDao;
 import com.jfms.message_history.dal.entity.P2PEntity;
 import com.jfms.message_history.dal.entity.P2PUpdateEntity;
-import com.jfms.message_history.model.P2PMessage;
-import com.jfms.message_history.model.P2PMessageRequest;
+import com.jfms.message_history.model.HistoryMessage;
+import com.jfms.message_history.model.HistoryMessageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,18 +28,18 @@ public class P2PService {
     @Autowired
     private P2PUpdateDao p2PUpdateDao;
 
-    public void saveMessage(String userId, P2PMessage messageForHistory) {
-        P2PEntity p2PEntity = messageConverter.p2PMessageToP2pEntity(userId, messageForHistory);
+    public void saveMessage(String userId, HistoryMessage messageForHistory) {
+        P2PEntity p2PEntity = messageConverter.historyMessageToP2pEntity(userId, messageForHistory);
         p2PDao.save(p2PEntity);
     }
 
-    public void editMessage(String userId, P2PMessage messageForUpdate) {
+    public void editMessage(String userId, HistoryMessage messageForUpdate) {
         P2PEntity previousP2PEntity = p2PDao.findByOwnerAndMessageIdAndStatusGreaterThanEqualAndStatusLessThanEqual(
                 userId, messageForUpdate.getMessageId(), 1, 2);
         if (previousP2PEntity.getStatus() == EntityStatus.DELETED.getValue())
             return;
         String previousValue = previousP2PEntity.getBody();
-        messageConverter.p2PMessageToP2pEntity(messageForUpdate, previousP2PEntity);
+        messageConverter.historyMessageToUpdatedP2pEntity(messageForUpdate, previousP2PEntity);
         p2PDao.save(previousP2PEntity);
 
         P2PUpdateEntity p2PUpdateEntity = dalAssistant.getP2PUpdateEntityFromP2PEntity(
@@ -50,13 +50,13 @@ public class P2PService {
         p2PUpdateDao.save(p2PUpdateEntity);
     }
 
-    public List<P2PMessage> getUserP2PMessages(String userId, String rosterId, P2PMessageRequest p2PMessageRequest) {
+    public List<HistoryMessage> getUserP2PMessages(String userId, String rosterId, Integer pageSize, Integer pageNumber) {
 //        List<P2PEntity> p2PEntityList = p2PDao.findByOwnerAndSenderAndStatus(
 //                userId,
 //                rosterId,
 //                PageRequest.of(
-//                        p2PMessageRequest.getPageNumber(),
-//                        p2PMessageRequest.getPageSize(),
+//                        historyMessageRequest.getPageNumber(),
+//                        historyMessageRequest.getPageSize(),
 //                        Sort.Direction.DESC,"time")
 //        );
 
@@ -67,11 +67,11 @@ public class P2PService {
                 1,
                 2
 //                PageRequest.of(
-//                        p2PMessageRequest.getPageNumber(),
-//                        p2PMessageRequest.getPageSize())
+//                        historyMessageRequest.getPageNumber(),
+//                        historyMessageRequest.getPageSize())
         );
         Collections.sort(p2PEntityList);
-        List<P2PMessage> sendP2PMessageList = messageConverter.p2PEntityListToP2PMessageList(p2PEntityList);
+        List<HistoryMessage> sendHistoryMessageList = messageConverter.p2PEntityListToHistoryMessageList(p2PEntityList);
         p2PEntityList =
                 p2PDao.findByOwnerAndSenderAndStatusGreaterThanEqualAndStatusLessThanEqual(
                         rosterId,
@@ -79,13 +79,13 @@ public class P2PService {
                         1,
                         2
 //                PageRequest.of(
-//                        p2PMessageRequest.getPageNumber(),
-//                        p2PMessageRequest.getPageSize())
+//                        historyMessageRequest.getPageNumber(),
+//                        historyMessageRequest.getPageSize())
                 );
         Collections.sort(p2PEntityList);
-        List<P2PMessage> replayP2PMessageList = messageConverter.p2PEntityListToP2PMessageList(p2PEntityList);
+        List<HistoryMessage> replayHistoryMessageList = messageConverter.p2PEntityListToHistoryMessageList(p2PEntityList);
 
-        return merge(sendP2PMessageList, replayP2PMessageList);
+        return merge(sendHistoryMessageList, replayHistoryMessageList);
     }
 
     public void deleteP2PMessage(String userId, List<String> messageIdList) {
@@ -99,30 +99,30 @@ public class P2PService {
 
     //------ helper
 
-    private List<P2PMessage> merge(List<P2PMessage> sendP2PMessageList, List<P2PMessage> replayP2PMessageList) {
-        List<P2PMessage> conversation = new ArrayList<P2PMessage>();
-        if (sendP2PMessageList == null && replayP2PMessageList == null)
+    public List<HistoryMessage> merge(List<HistoryMessage> sendHistoryMessageList, List<HistoryMessage> replayHistoryMessageList) {
+        List<HistoryMessage> conversation = new ArrayList<HistoryMessage>();
+        if (sendHistoryMessageList == null && replayHistoryMessageList == null)
             return null;
-        if (sendP2PMessageList == null)
-            return replayP2PMessageList;
-        if (replayP2PMessageList == null)
-            return sendP2PMessageList;
+        if (sendHistoryMessageList == null)
+            return replayHistoryMessageList;
+        if (replayHistoryMessageList == null)
+            return sendHistoryMessageList;
         int i = 0;
         int j = 0;
-        while (i != sendP2PMessageList.size() && j!=replayP2PMessageList.size()){
-            if (sendP2PMessageList.get(i).getTime() < replayP2PMessageList.get(j).getTime()){
-                conversation.add(sendP2PMessageList.get(i));
+        while (i != sendHistoryMessageList.size() && j!= replayHistoryMessageList.size()){
+            if (sendHistoryMessageList.get(i).getTime() < replayHistoryMessageList.get(j).getTime()){
+                conversation.add(sendHistoryMessageList.get(i));
                 i++;
             }
             else{
-                conversation.add(replayP2PMessageList.get(j));
+                conversation.add(replayHistoryMessageList.get(j));
                 j++;
             }
         }
-        if (i == sendP2PMessageList.size() && j < replayP2PMessageList.size())
-            conversation.addAll(replayP2PMessageList.subList(j, replayP2PMessageList.size()));
-        else if (j == replayP2PMessageList.size() && i < sendP2PMessageList.size() )
-            conversation.addAll(sendP2PMessageList.subList(i, sendP2PMessageList.size()));
+        if (i == sendHistoryMessageList.size() && j < replayHistoryMessageList.size())
+            conversation.addAll(replayHistoryMessageList.subList(j, replayHistoryMessageList.size()));
+        else if (j == replayHistoryMessageList.size() && i < sendHistoryMessageList.size() )
+            conversation.addAll(sendHistoryMessageList.subList(i, sendHistoryMessageList.size()));
         return conversation;
     }
 }

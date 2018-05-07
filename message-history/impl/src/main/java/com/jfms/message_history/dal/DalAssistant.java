@@ -1,5 +1,7 @@
 package com.jfms.message_history.dal;
 
+import com.jfms.message_history.dal.entity.GroupEntity;
+import com.jfms.message_history.dal.entity.GroupUpdateEntity;
 import com.jfms.message_history.dal.entity.P2PEntity;
 import com.jfms.message_history.dal.entity.P2PUpdateEntity;
 import org.springframework.stereotype.Component;
@@ -16,5 +18,18 @@ public class DalAssistant {
         p2PUpdateEntity.setCurrentValue(p2PEntity.getBody());
         p2PUpdateEntity.setUpdateTime(time);
         return p2PUpdateEntity;
+    }
+
+    public GroupUpdateEntity getGroupUpdateEntityFromGroupEntity(
+            String previousValue, Long time, GroupEntity groupEntity) {
+        if (groupEntity == null)
+            return null;
+        GroupUpdateEntity groupUpdateEntity = new GroupUpdateEntity();
+        groupUpdateEntity.setMessageId(groupEntity.getMessageId());
+        groupUpdateEntity.setEditor(groupEntity.getSender());
+        groupUpdateEntity.setPreviousValue(previousValue);
+        groupUpdateEntity.setCurrentValue(groupEntity.getBody());
+        groupUpdateEntity.setUpdateTime(time);
+        return groupUpdateEntity;
     }
 }

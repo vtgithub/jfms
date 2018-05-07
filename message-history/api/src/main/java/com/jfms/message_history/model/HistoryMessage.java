@@ -1,13 +1,13 @@
 package com.jfms.message_history.model;
 
-public class P2PMessage {
+public class HistoryMessage {
     private String messageId;
     private String sender;
     private String body;
     private String subject;
     private Long time;
 
-    public P2PMessage(String messageId, String sender, String body, String subject, Long time) {
+    public HistoryMessage(String messageId, String sender, String body, String subject, Long time) {
         this.messageId = messageId;
         this.sender = sender;
         this.body = body;
@@ -15,7 +15,7 @@ public class P2PMessage {
         this.time = time;
     }
 
-    public P2PMessage() {
+    public HistoryMessage() {
     }
 
     public String getMessageId() {

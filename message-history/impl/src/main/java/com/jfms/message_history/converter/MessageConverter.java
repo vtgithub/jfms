@@ -1,8 +1,9 @@
 package com.jfms.message_history.converter;
 
 import com.jfms.message_history.dal.EntityStatus;
+import com.jfms.message_history.dal.entity.GroupEntity;
 import com.jfms.message_history.dal.entity.P2PEntity;
-import com.jfms.message_history.model.P2PMessage;
+import com.jfms.message_history.model.HistoryMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 @Component
 public class MessageConverter {
 
-    public P2PEntity p2PMessageToP2pEntity(String userId, P2PMessage messageForHistory) {
+    public P2PEntity historyMessageToP2pEntity(String userId, HistoryMessage messageForHistory) {
         if (messageForHistory == null)
             return null;
         P2PEntity p2PEntity = new P2PEntity();
@@ -25,7 +26,7 @@ public class MessageConverter {
         return p2PEntity;
     }
 
-    public void p2PMessageToP2pEntity(P2PMessage messageForHistory, P2PEntity previousP2PEntity) {
+    public void historyMessageToUpdatedP2pEntity(HistoryMessage messageForHistory, P2PEntity previousP2PEntity) {
         previousP2PEntity.setBody(messageForHistory.getBody());
 //        previousP2PEntity.setFrom(messageForHistory.getFrom());
 //        previousP2PEntity.setMessageId(messageForHistory.getMessageId());
@@ -34,20 +35,20 @@ public class MessageConverter {
         previousP2PEntity.setStatus(EntityStatus.UPDATED.getValue());
     }
 
-    public List<P2PMessage> p2PEntityListToP2PMessageList(List<P2PEntity> p2PEntityList) {
+    public List<HistoryMessage> p2PEntityListToHistoryMessageList(List<P2PEntity> p2PEntityList) {
         if (p2PEntityList == null)
             return null;
-        List<P2PMessage> p2PMessageList = new ArrayList<P2PMessage>();
+        List<HistoryMessage> historyMessageList = new ArrayList<HistoryMessage>();
         for (P2PEntity p2PEntity : p2PEntityList) {
-            p2PMessageList.add(p2PEntityToP2PMessage(p2PEntity));
+            historyMessageList.add(p2PEntityToHistoyMessage(p2PEntity));
         }
-        return p2PMessageList;
+        return historyMessageList;
     }
 
-    private P2PMessage p2PEntityToP2PMessage(P2PEntity p2PEntity) {
+    private HistoryMessage p2PEntityToHistoyMessage(P2PEntity p2PEntity) {
         if (p2PEntity == null)
             return null;
-        P2PMessage p2PMessage = new P2PMessage(
+        HistoryMessage historyMessage = new HistoryMessage(
                 p2PEntity.getMessageId(),
                 p2PEntity.getSender(),
                 p2PEntity.getBody(),
@@ -55,6 +56,46 @@ public class MessageConverter {
                 p2PEntity.getTime()
 
         );
-        return p2PMessage;
+        return historyMessage;
+    }
+
+    public GroupEntity historyMessageToGroupEntity(String groupId, HistoryMessage messageForHistory) {
+        if (messageForHistory == null)
+            return null;
+        GroupEntity groupEntity = new GroupEntity();
+        groupEntity.setGroupId(groupId);
+        groupEntity.setBody(messageForHistory.getBody());
+        groupEntity.setSender(messageForHistory.getSender());
+        groupEntity.setMessageId(messageForHistory.getMessageId());
+        groupEntity.setSubject(messageForHistory.getSubject());
+        groupEntity.setTime(messageForHistory.getTime());
+        groupEntity.setStatus(EntityStatus.INSERTED.getValue());
+        return groupEntity;
+    }
+
+    public void historyMessageToUpdatedGroupEntity(HistoryMessage messageForUpdate, GroupEntity previousGroupEntity) {
+        previousGroupEntity.setBody(messageForUpdate.getBody());
+        previousGroupEntity.setSubject(messageForUpdate.getSubject());
+        previousGroupEntity.setStatus(EntityStatus.UPDATED.getValue());
+    }
+
+    public List<HistoryMessage> groupEntityListToHistoryMessageList(List<GroupEntity> groupEntityList) {
+        if (groupEntityList == null)
+            return null;
+        List<HistoryMessage> historyMessageList = new ArrayList<HistoryMessage>();
+        for (GroupEntity groupEntity : groupEntityList) {
+            historyMessageList.add(groupEntityToHistoyMessage(groupEntity));
+        }
+        return historyMessageList;
+    }
+
+    private HistoryMessage groupEntityToHistoyMessage(GroupEntity groupEntity) {
+        return new HistoryMessage(
+                groupEntity.getMessageId(),
+                groupEntity.getSender(),
+                groupEntity.getBody(),
+                groupEntity.getSubject(),
+                groupEntity.getTime()
+        );
     }
 }
