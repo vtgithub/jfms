@@ -1,7 +1,7 @@
 # jfms
 java fast messaging service
 
-## authentication microservice
+## AAA microservice
 port number is `6070`.
 
 | Method | URL | Body | Header | Return value | description |
@@ -10,6 +10,8 @@ port number is `6070`.
 | `POST` | `aaa/user/activate` | {`activationCode`, `mobileNumber`} | --- | {`token`} | return a jwt token to user |
 | `POST` | `aaa/user/activation/code` | {`mobileNumber`, `activationCodeLength`} | --- | --- | send an `activation code` to user vis sms |
 | `GET` | `aaa/user/reactivate` | --- | `auth` | {`token`} | return a jwt token to user |
+| `POST` | `aaa/group` | {`displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | --- | `groupId` | register a new group in system and return groupId. |
+| `GET` | `aaa/group/{gId}` | --- | --- |  {`displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | returns `groupInfo` belongs to the `gId`. | 
 
 ## offline-message
 port number is `7070`.
@@ -43,3 +45,5 @@ websocket port number is `4042`.
 | {`method`, `from`, `to`, `leaveTime`} | --- | `JFMSClientConversationLeaveMessage` is sending to engine by user leaving conversation. Engine update value of `last_seen_hash` map and send `JFMSServerConversationMessage` to the `to` field. |
 | {`method`, `from`, `to`} | {`from`, `leaveTime`} | `JFMSClientConversationInMessage` is sending to engine by user come into conversation. Engine get leave time of user `to` from `last_seen_hash` map and send back `JFMSServerConversationMessage`. |
 | {`method`, `from`, `to`, [`messageIdList`], `seenTime`} | --- | `JFMSClientSeenMessage` is sending to engine, `JFMSServerSeenMessage` generated from it and send to `to` field. | 
+
+* Note: `groupSendMessage`, `groupEditMessage`, `groupDeleteMessage`, `groupIsTypingMessage`, `groupLeaveMessage` are just like above p2p messages but by other `method` field values. 
