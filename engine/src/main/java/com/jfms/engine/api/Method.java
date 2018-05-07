@@ -13,7 +13,9 @@ public enum Method {
     GROUP_CREATION(10),
     GROUP_SEND(11),
     GROUP_EDIT(12),
-    GROUP_DELETE(13);
+    GROUP_DELETE(13),
+    GROUP_IS_TYPING(14),
+    GROUP_CONVERSATION_LEAVE(15);
 
     private int value;
 

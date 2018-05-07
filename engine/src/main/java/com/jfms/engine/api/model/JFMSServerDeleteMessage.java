@@ -10,8 +10,8 @@ public class JFMSServerDeleteMessage {
     private String id;
     private String from;
 
-    public JFMSServerDeleteMessage(String id, String from) {
-        this.method = Method.DELETE.getValue();
+    public JFMSServerDeleteMessage(Integer method, String id, String from) {
+        this.method = method;
         this.id = id;
         this.from = from;
     }

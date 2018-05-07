@@ -9,8 +9,8 @@ public class JFMSServerIsTypingMessage {
     private Integer method;
     private String from;
 
-    public JFMSServerIsTypingMessage(String from) {
-        this.method = Method.IS_TYPING.getValue();
+    public JFMSServerIsTypingMessage(Integer method, String from) {
+        this.method = method;
         this.from = from;
     }
 

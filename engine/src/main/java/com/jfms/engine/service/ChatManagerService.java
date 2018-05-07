@@ -24,6 +24,7 @@ public class ChatManagerService {
 
         String messageInJson = message.getPayload();
         int methodNo = fetchMethod(messageInJson);
+
         if(methodNo == Method.INIT.getValue()) {
             JFMSClientLoginMessage jfmsClientLoginMessage = gson.fromJson(messageInJson, JFMSClientLoginMessage.class);
             chatManager.init(jfmsClientLoginMessage, session);
@@ -38,7 +39,7 @@ public class ChatManagerService {
             chatManager.deleteMessage(jfmsClientDeleteMessage);
         } else if (methodNo == Method.IS_TYPING.getValue()){
             JFMSClientIsTypingMessage jfmsClientIsTypingMessage = gson.fromJson(messageInJson, JFMSClientIsTypingMessage.class);
-            chatManager.sendIsTypingMessage(jfmsClientIsTypingMessage);
+            chatManager.isTypingMessage(jfmsClientIsTypingMessage);
         } else if (methodNo == Method.PING.getValue()){
             JFMSClientPingMessage jfmsClientPingMessage =
                     gson.fromJson(messageInJson, JFMSClientPingMessage.class);
@@ -63,6 +64,22 @@ public class ChatManagerService {
             JFMSClientSendMessage jfmsClientGroupSendMessage =
                     gson.fromJson(messageInJson, JFMSClientSendMessage.class);
             chatManager.sendGroupMessage(jfmsClientGroupSendMessage, session);
+        } else if (methodNo == Method.GROUP_EDIT.getValue()){
+            JFMSClientEditMessage jfmsClientGroupEditMessage =
+                    gson.fromJson(messageInJson, JFMSClientEditMessage.class);
+            chatManager.editGroupMessage(jfmsClientGroupEditMessage);
+        } else if (methodNo == Method.GROUP_DELETE.getValue()){
+            JFMSClientDeleteMessage jfmsClientGroupDeleteMessage=
+                    gson.fromJson(messageInJson, JFMSClientDeleteMessage.class);
+            chatManager.deleteGroupMessage(jfmsClientGroupDeleteMessage);
+        } else if (methodNo == Method.GROUP_IS_TYPING.getValue()){
+            JFMSClientIsTypingMessage jfmsClientIsTypingMessage =
+                    gson.fromJson(messageInJson, JFMSClientIsTypingMessage.class);
+            chatManager.groupIsTypingMessage(jfmsClientIsTypingMessage);
+        } else if (methodNo == Method.GROUP_CONVERSATION_LEAVE.getValue()){
+            JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage =
+                    gson.fromJson(messageInJson, JFMSClientConversationLeaveMessage.class);
+            chatManager.setGroupLeaveTime(jfmsClientConversationLeaveMessage);
         }
     }
 

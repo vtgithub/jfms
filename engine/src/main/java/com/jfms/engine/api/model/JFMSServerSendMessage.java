@@ -16,8 +16,8 @@ public class JFMSServerSendMessage {
     private Long sendTime;
 
 
-    public JFMSServerSendMessage(String id, String from, String body, String subject, Long sendTime) {
-        this.method = Method.SEND.getValue();
+    public JFMSServerSendMessage(Integer method, String id, String from, String body, String subject, Long sendTime) {
+        this.method = method;
         this.id = id;
         this.from = from;
         this.body = body;

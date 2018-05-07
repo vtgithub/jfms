@@ -20,7 +20,8 @@ public class JFMSMessageConverter {
                 jfmsClientEditMessage.getFrom(),
                 jfmsClientEditMessage.getBody(),
                 jfmsClientEditMessage.getSubject(),
-                jfmsClientEditMessage.getEditTime()
+                jfmsClientEditMessage.getEditTime(),
+                jfmsClientEditMessage.getMethod()
         );
     }
 
@@ -28,6 +29,7 @@ public class JFMSMessageConverter {
         if (jfmsClientDeleteMessage == null)
             return null;
         return new JFMSServerDeleteMessage(
+                    jfmsClientDeleteMessage.getMethod(),
                     jfmsClientDeleteMessage.getId(),
                     jfmsClientDeleteMessage.getFrom()
                 );
@@ -36,7 +38,10 @@ public class JFMSMessageConverter {
     public JFMSServerIsTypingMessage clientIsTypingToServerIsTyping(JFMSClientIsTypingMessage jfmsClientIsTypingMessage) {
         if (jfmsClientIsTypingMessage == null)
             return null;
-        return new JFMSServerIsTypingMessage(jfmsClientIsTypingMessage.getFrom());
+        return new JFMSServerIsTypingMessage(
+                jfmsClientIsTypingMessage.getMethod(),
+                jfmsClientIsTypingMessage.getFrom()
+        );
     }
 
     public JFMSServerConversationMessage clientConversationLeaveToServerConversation(
@@ -62,6 +67,7 @@ public class JFMSMessageConverter {
 
     public JFMSServerSendMessage clientSendToServerSend(String messageId, JFMSClientSendMessage jfmsClientSendMessage) {
         return new JFMSServerSendMessage(
+                jfmsClientSendMessage.getMethod(),
                 messageId,
                 jfmsClientSendMessage.getFrom(),
                 jfmsClientSendMessage.getBody(),

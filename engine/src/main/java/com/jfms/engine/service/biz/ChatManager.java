@@ -7,11 +7,9 @@ import com.jfms.engine.api.converter.JFMSMessageConverter;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.remote.GroupConverter;
-import com.jfms.engine.service.biz.remote.OnlineMessageConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
 import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;
-import com.jfms.engine.service.biz.remote.model.OnlineMessageEntity;
 import com.jfms.message_history.model.P2PMessage;
 import com.jfms.offline_message.model.OfflineMessage;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,8 +29,6 @@ public class ChatManager implements InitializingBean {
 
     @Autowired
     OnlineMessageRepository onlineMessageRepository;
-    @Autowired
-    OnlineMessageConverter onlineMessageConverter;
     @Autowired
     PresenceRepository presenceRepository;
     @Autowired
@@ -58,7 +54,6 @@ public class ChatManager implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         onlineMessageListener.init(
-                onlineMessageConverter,
                 userSessionRepository
         );
         onlineMessageRepository.setMessageListener(onlineMessageListener);
@@ -81,24 +76,11 @@ public class ChatManager implements InitializingBean {
 
     public void sendMessage(JFMSClientSendMessage jfmsClientSendMessage, WebSocketSession session) {
         String messageId = UUID.randomUUID().toString();
-        String receiverStatus= presenceRepository.getPresenceStatus(jfmsClientSendMessage.getTo());
-        if (receiverStatus == null || receiverStatus.equals(UserStatus.OFFLINE.getValue())){
-            OfflineMessage offlineMessage = OfflineMessageApiClient.getOfflineMessage(
-                    jfmsClientSendMessage.getTo(),
-                    gson.toJson(jfmsMessageConverter.clientSendToServerSend(messageId, jfmsClientSendMessage))
-            );
-            offlineMessageApiClient.produceMessage(offlineMessage);
-        }else{
-            OnlineMessageEntity onlineMessageEntity = onlineMessageConverter.getOnlineMessageEntity(messageId, jfmsClientSendMessage);
-            String redisChannelEntityJson = gson.toJson(onlineMessageEntity);
-            onlineMessageRepository.sendMessage(
-                    getChannelName(jfmsClientSendMessage.getFrom() , jfmsClientSendMessage.getTo()),
-                    redisChannelEntityJson
-            );
-        }
-        String messageIdJson = "{\"id\":\"" + messageId + "\"}";
+        JFMSServerSendMessage jfmsServerSendMessage =
+                jfmsMessageConverter.clientSendToServerSend(messageId, jfmsClientSendMessage);
+        sendOnlineOrOffline(jfmsClientSendMessage.getTo(), gson.toJson(jfmsServerSendMessage));
         try {
-            session.sendMessage(new TextMessage(messageIdJson));
+            session.sendMessage(new TextMessage("{\"id\":\"" + messageId + "\"}"));
         } catch (IOException e) {
             e.printStackTrace();
             //todo log
@@ -141,16 +123,10 @@ public class ChatManager implements InitializingBean {
         );
     }
 
-    public void sendIsTypingMessage(JFMSClientIsTypingMessage jfmsClientIsTypingMessage) {
-        WebSocketSession session = userSessionRepository.getSession(jfmsClientIsTypingMessage.getTo());
+    public void isTypingMessage(JFMSClientIsTypingMessage jfmsClientIsTypingMessage) {
         JFMSServerIsTypingMessage jfmsServerIsTypingMessage =
                 jfmsMessageConverter.clientIsTypingToServerIsTyping(jfmsClientIsTypingMessage);
-        try {
-            session.sendMessage(new TextMessage(gson.toJson(jfmsServerIsTypingMessage)));
-        } catch (IOException e) {
-            e.printStackTrace();
-            //todo log
-        }
+        sendOnline(jfmsClientIsTypingMessage.getTo(), gson.toJson(jfmsServerIsTypingMessage));
     }
 
     public void updatePresenceTime(JFMSClientPingMessage jfmsClientPingMessage, WebSocketSession session) {
@@ -227,6 +203,8 @@ public class ChatManager implements InitializingBean {
         sendGroupCreationMessageToMembers(
                 jfmsMessageConverter.clientGroupCreationToServerGroupCreation(groupId, jfmsClientGroupCreationMessage)
         );
+
+        //todo group message History
         try {
             session.sendMessage(new TextMessage(groupId));
         } catch (IOException e) {
@@ -235,18 +213,94 @@ public class ChatManager implements InitializingBean {
         }
     }
 
+    //--------------- group messaging
     public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
-        fdf//todo impl
+
+        String messageId = UUID.randomUUID().toString();
+        JFMSServerSendMessage jfmsServerSendMessage =
+                jfmsMessageConverter.clientSendToServerSend(messageId, jfmsClientGroupSendMessage);
+        sendGroupOnlineOrOffline(
+                jfmsClientGroupSendMessage.getFrom(),
+                jfmsClientGroupSendMessage.getTo(),
+                gson.toJson(jfmsServerSendMessage)
+        );
+
+        try {
+            session.sendMessage(new TextMessage("{\"id\":\"" + messageId+ "\"}"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo log
+        }
+        //todo group message history
+    }
+
+    public void editGroupMessage(JFMSClientEditMessage jfmsClientGroupEditMessage){
+        JFMSServerEditMessage jfmsServerGroupEditMessage =
+                jfmsMessageConverter.clientEditToServerEdit(jfmsClientGroupEditMessage);
+        sendGroupOnlineOrOffline(
+                jfmsClientGroupEditMessage.getFrom(),
+                jfmsClientGroupEditMessage.getTo(),
+                gson.toJson(jfmsServerGroupEditMessage)
+        );
+        //todo group message history
+    }
+
+    public void deleteGroupMessage(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage){
+        JFMSServerDeleteMessage jfmsServerGroupDeleteMessage =
+                jfmsMessageConverter.clientDeleteToServerDelete(jfmsClientGroupDeleteMessage);
+        sendGroupOnlineOrOffline(
+                jfmsClientGroupDeleteMessage.getFrom(),
+                jfmsClientGroupDeleteMessage.getTo(),
+                gson.toJson(jfmsServerGroupDeleteMessage)
+        );
+        //todo group delete message history
+    }
+
+    public void groupIsTypingMessage(JFMSClientIsTypingMessage jfmsClientGroupIsTypingMessage) {
+        JFMSServerIsTypingMessage jfmsServerGroupIsTypingMessage =
+                jfmsMessageConverter.clientIsTypingToServerIsTyping(jfmsClientGroupIsTypingMessage);
+        sendGroupOnline(
+                jfmsClientGroupIsTypingMessage.getFrom(),
+                jfmsClientGroupIsTypingMessage.getTo(),
+                gson.toJson(jfmsServerGroupIsTypingMessage)
+        );
+    }
+
+
+    public void setGroupLeaveTime(JFMSClientConversationLeaveMessage jfmsClientGroupConversationLeaveMessage) {
+        lastSeenRepository.setLastSeen(
+                jfmsClientGroupConversationLeaveMessage.getFrom(),
+                jfmsClientGroupConversationLeaveMessage.getTo(),
+                jfmsClientGroupConversationLeaveMessage.getLeaveTime()
+        );
+        JFMSServerConversationMessage jfmsServerConversationMessage =
+                jfmsMessageConverter.clientConversationLeaveToServerConversation(jfmsClientGroupConversationLeaveMessage);
+        sendGroupOnlineOrOffline(
+                jfmsClientGroupConversationLeaveMessage.getFrom(),
+                jfmsClientGroupConversationLeaveMessage.getTo(),
+                gson.toJson(jfmsServerConversationMessage)
+        );
+
     }
 
     //---------------------------------
-
     private void sendGroupCreationMessageToMembers(JFMSServerGroupCreationMessage jfmsServerGroupCreationMessage) {
         Iterator<Map.Entry<String, Boolean>> memberIterator = jfmsServerGroupCreationMessage.getJfmsGroupMemberMap().entrySet().iterator();
         while (memberIterator.hasNext()){
             Map.Entry<String, Boolean> member = memberIterator.next();
             sendOnlineOrOffline(member.getKey(), gson.toJson(jfmsServerGroupCreationMessage));
 
+        }
+    }
+
+    private void sendGroupOnlineOrOffline(String from, String groupId, String message) {
+        GroupInfoEntity groupInfoEntity = groupRepository.getGroupInfo(groupId);
+        if (!groupInfoEntity.contains(from))
+            return;
+        Iterator<Map.Entry<String, Boolean>> groupIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
+        while (groupIterator.hasNext()){
+            Map.Entry<String, Boolean> next = groupIterator.next();
+            sendOnlineOrOffline(next.getKey(), message);
         }
     }
 
@@ -257,13 +311,25 @@ public class ChatManager implements InitializingBean {
                     OfflineMessageApiClient.getOfflineMessage(user, message);
             offlineMessageApiClient.produceMessage(offlineMessage);
         }else {
-            WebSocketSession userSession = userSessionRepository.getSession(user);
-            try {
-                userSession.sendMessage(new TextMessage(message));
-            } catch (IOException e) {
-                e.printStackTrace();
-                //todo log
-            }
+            onlineMessageRepository.sendMessage(user, message);
+        }
+    }
+
+    private void sendGroupOnline(String from, String groupId, String message) {
+        GroupInfoEntity groupInfoEntity = groupRepository.getGroupInfo(groupId);
+        if (!groupInfoEntity.contains(from))
+            return;
+        Iterator<Map.Entry<String, Boolean>> gIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
+        while (gIterator.hasNext()){
+            Map.Entry<String, Boolean> next = gIterator.next();
+            sendOnline(next.getKey(), message);
+        }
+    }
+
+    private void sendOnline(String user, String message){
+        String memberPresenceStatus = presenceRepository.getPresenceStatus(user);
+        if (memberPresenceStatus != null && memberPresenceStatus.equals("online")){
+            onlineMessageRepository.sendMessage(user, message);
         }
     }
 

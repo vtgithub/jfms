@@ -14,14 +14,13 @@ public class JFMSServerEditMessage {
     private Long editTime;
     private Integer method;
 
-
-    public JFMSServerEditMessage(String id, String from, String body, String subject, Long editTime) {
-        this.method = Method.EDIT.getValue();
+    public JFMSServerEditMessage(String id, String from, String body, String subject, Long editTime, Integer method) {
         this.id = id;
         this.from = from;
         this.body = body;
         this.subject = subject;
         this.editTime = editTime;
+        this.method = method;
     }
 
     public JFMSServerEditMessage() {

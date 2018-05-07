@@ -19,4 +19,11 @@ public class GroupRepositoryRedisImpl implements GroupRepository {
     public void saveGroupInfo(String groupId, GroupInfoEntity groupInfoEntity) {
         redisDao.hset("group_info".getBytes(), groupId.getBytes(), SerializationUtils.serialize(groupInfoEntity));
     }
+
+    @Override
+    public GroupInfoEntity getGroupInfo(String groupId) {
+        byte[] groupInfoBytes = redisDao.hget("group_info".getBytes(), groupId.getBytes());
+        GroupInfoEntity groupInfoEntity = (GroupInfoEntity) SerializationUtils.deserialize(groupInfoBytes);
+        return groupInfoEntity;
+    }
 }

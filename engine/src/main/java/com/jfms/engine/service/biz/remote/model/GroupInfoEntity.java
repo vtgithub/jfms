@@ -1,6 +1,7 @@
 package com.jfms.engine.service.biz.remote.model;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Map;
 
 public class GroupInfoEntity implements Serializable{
@@ -50,5 +51,19 @@ public class GroupInfoEntity implements Serializable{
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public boolean containsAsAdmin(String user) {
+        Iterator<Map.Entry<String, Boolean>> iterator = jfmsGroupMemberMap.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<String, Boolean> next = iterator.next();
+            if (next.getKey().equals(user) && next.getValue()) //check sender is admin or not
+                return true;
+        }
+        return false;
+    }
+
+    public boolean contains(String user) {
+        return jfmsGroupMemberMap.containsKey(user);
     }
 }
