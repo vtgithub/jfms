@@ -25,7 +25,7 @@ public class GroupApiImpl implements GroupApi{
     }
 
 
-    public @ResponseBody void editGroup(GroupInfo groupInfo){
+    public @ResponseBody void editGroup(@RequestBody GroupInfo groupInfo){
         try {
             groupService.editGroup(groupInfo);
         } catch (NotFoundException e) {
@@ -48,6 +48,11 @@ public class GroupApiImpl implements GroupApi{
     }
 
     public @ResponseBody void deleteGroup(@PathVariable("gId") String groupId) {
-        groupService.deleteGroup(groupId);
+        try {
+            groupService.deleteGroup(groupId);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            throw new InvalidInputDataException(e);
+        }
     }
 }

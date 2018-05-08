@@ -9,6 +9,7 @@ import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.remote.GroupConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
+import com.jfms.engine.service.biz.remote.api.aaa.GroupApiClient;
 import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryGroupApiClient;
 import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryP2PApiClient;
 import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;

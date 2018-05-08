@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 public class GroupMemberObject implements Serializable{
     private String userName;
-    private Boolean isAdmin;
+    private Boolean admin;
 
     public GroupMemberObject(String userName, Boolean isAdmin) {
         this.userName = userName;
-        this.isAdmin = isAdmin;
+        this.admin= isAdmin;
     }
 
     public GroupMemberObject() {
@@ -23,10 +23,10 @@ public class GroupMemberObject implements Serializable{
     }
 
     public Boolean getAdmin() {
-        return isAdmin;
+        return admin;
     }
 
     public void setAdmin(Boolean admin) {
-        isAdmin = admin;
+        this.admin = admin;
     }
 }

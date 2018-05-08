@@ -14,13 +14,16 @@ import java.util.List;
 public class GroupEntity {
     @Id
     private ObjectId id;
+    private Integer status;
     private String displayName;
+    private List<String> displayNameChangeHistory;
     private String owner;
     private List<GroupMemberObject> memberObjectList;
     private Integer type;
 
 
-    public GroupEntity(String displayName, String owner, List<GroupMemberObject> memberObjectList, Integer type) {
+    public GroupEntity(Integer status, String displayName, String owner, List<GroupMemberObject> memberObjectList, Integer type) {
+        this.status = status;
         this.displayName = displayName;
         this.owner = owner;
         this.memberObjectList = memberObjectList;
@@ -28,6 +31,22 @@ public class GroupEntity {
     }
 
     public GroupEntity() {
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public List<String> getDisplayNameChangeHistory() {
+        return displayNameChangeHistory;
+    }
+
+    public void setDisplayNameChangeHistory(List<String> displayNameChangeHistory) {
+        this.displayNameChangeHistory = displayNameChangeHistory;
     }
 
     public ObjectId getId() {

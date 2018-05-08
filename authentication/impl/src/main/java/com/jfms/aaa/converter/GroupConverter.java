@@ -1,5 +1,6 @@
 package com.jfms.aaa.converter;
 
+import com.jfms.aaa.dal.EntityStatus;
 import com.jfms.aaa.dal.entity.GroupEntity;
 import com.jfms.aaa.dal.entity.GroupMemberObject;
 import com.jfms.aaa.model.GroupInfo;
@@ -12,8 +13,9 @@ import java.util.List;
 @Component
 public class GroupConverter {
 
-    public GroupEntity getEntity(GroupInfo groupInfo) {
+    public GroupEntity getEntity(Integer status, GroupInfo groupInfo) {
         return new GroupEntity(
+                status,
                 groupInfo.getDisplayName(),
                 groupInfo.getOwner(),
                 getMemberObjectList(groupInfo.getMemberList()),
@@ -49,10 +51,16 @@ public class GroupConverter {
 
 
     public void updateEntityByInfo(GroupEntity groupEntity, GroupInfo groupInfo) {
+        List<String> displayNameChangeHistory = groupEntity.getDisplayNameChangeHistory();
+        if (displayNameChangeHistory == null || displayNameChangeHistory.size() == 0)
+            displayNameChangeHistory = new ArrayList<>();
+        groupEntity.setDisplayNameChangeHistory(displayNameChangeHistory);
+        displayNameChangeHistory.add(groupEntity.getDisplayName());
         groupEntity.setDisplayName(groupInfo.getDisplayName());
         groupEntity.setOwner(groupInfo.getOwner());
         groupEntity.setType(groupInfo.getType());
         groupEntity.setMemberObjectList(getMemberObjectList(groupInfo.getMemberList()));
+
     }
 
     // ------------------------------------------------
