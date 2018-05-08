@@ -1,4 +1,4 @@
-package com.jfms.engine.service.biz.remote.api;
+package com.jfms.engine.service.biz.remote.api.message_history;
 
 import com.jfms.message_history.P2PHistoryApi;
 import com.jfms.message_history.model.HistoryMessage;

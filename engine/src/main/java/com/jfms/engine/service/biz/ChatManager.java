@@ -9,6 +9,8 @@ import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.remote.GroupConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
+import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryGroupApiClient;
+import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryP2PApiClient;
 import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;
 import com.jfms.message_history.model.HistoryMessage;
 import com.jfms.offline_message.model.OfflineMessage;
@@ -42,9 +44,7 @@ public class ChatManager implements InitializingBean {
     @Autowired
     OfflineMessageApiClient offlineMessageApiClient;
     @Autowired
-    MessageHistoryP2PApiClient messageHistoryP2PApiClient;
-    @Autowired
-    MessageHistoryGroupApi messageHistoryGroupApi;
+    MessageHistoryApiFactory messageHistoryApiFactory;
     @Autowired
     GroupApiClient groupApiClient;
     @Autowired
@@ -94,7 +94,7 @@ public class ChatManager implements InitializingBean {
                 jfmsClientSendMessage.getSubject(),
                 jfmsClientSendMessage.getSendTime()
         );
-        messageHistoryP2PApiClient.saveP2PHistoryMessage(jfmsClientSendMessage.getTo(), p2PHistoryMessage);
+        messageHistoryApiFactory.getP2PApi().saveP2PHistoryMessage(jfmsClientSendMessage.getTo(), p2PHistoryMessage);
     }
 
     public void editMessage(JFMSClientEditMessage jfmsClientEditMessage) {
@@ -110,7 +110,7 @@ public class ChatManager implements InitializingBean {
                 jfmsClientEditMessage.getSubject(),
                 jfmsClientEditMessage.getEditTime()
         );
-        messageHistoryP2PApiClient.updateP2PHistoryMessage(jfmsClientEditMessage.getTo(), p2PHistoryMessage);
+        messageHistoryApiFactory.getP2PApi().updateP2PHistoryMessage(jfmsClientEditMessage.getTo(), p2PHistoryMessage);
     }
 
     public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage) {
@@ -119,7 +119,7 @@ public class ChatManager implements InitializingBean {
 
         sendOnlineOrOffline(jfmsClientDeleteMessage.getTo(), gson.toJson(jfmsServerDeleteMessage));
 
-        messageHistoryP2PApiClient.deleteP2PMessage(
+        messageHistoryApiFactory.getP2PApi().deleteP2PMessage(
                 jfmsClientDeleteMessage.getTo(),
                 jfmsClientDeleteMessage.getIdList()
         );
@@ -249,14 +249,14 @@ public class ChatManager implements InitializingBean {
             e.printStackTrace();
             //todo log
         }
-        HistoryMessage groupHistoryMessage = MessageHistoryGroupApi.getGroupHistoryMessage(
+        HistoryMessage groupHistoryMessage = MessageHistoryGroupApiClient.getGroupHistoryMessage(
                 messageId,
                 jfmsClientGroupSendMessage.getFrom(),
                 jfmsClientGroupSendMessage.getBody(),
                 jfmsClientGroupSendMessage.getSubject(),
                 jfmsClientGroupSendMessage.getSendTime()
         );
-        messageHistoryGroupApi.saveGroupHistoryMessage(jfmsClientGroupSendMessage.getTo(), groupHistoryMessage);
+        messageHistoryApiFactory.getGroupApi().saveGroupHistoryMessage(jfmsClientGroupSendMessage.getTo(), groupHistoryMessage);
     }
 
     public void editGroupMessage(JFMSClientEditMessage jfmsClientGroupEditMessage){
@@ -267,14 +267,14 @@ public class ChatManager implements InitializingBean {
                 jfmsClientGroupEditMessage.getTo(),
                 gson.toJson(jfmsServerGroupEditMessage)
         );
-        HistoryMessage groupHistoryMessage = MessageHistoryGroupApi.getGroupHistoryMessage(
+        HistoryMessage groupHistoryMessage = MessageHistoryGroupApiClient.getGroupHistoryMessage(
                 jfmsClientGroupEditMessage.getId(),
                 jfmsClientGroupEditMessage.getFrom(),
                 jfmsClientGroupEditMessage.getBody(),
                 jfmsClientGroupEditMessage.getSubject(),
                 jfmsClientGroupEditMessage.getEditTime()
         );
-        messageHistoryGroupApi.updateGroupHistoryMessage(jfmsClientGroupEditMessage.getTo(), groupHistoryMessage);
+        messageHistoryApiFactory.getGroupApi().updateGroupHistoryMessage(jfmsClientGroupEditMessage.getTo(), groupHistoryMessage);
     }
 
     public void deleteGroupMessage(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage){
@@ -285,7 +285,7 @@ public class ChatManager implements InitializingBean {
                 jfmsClientGroupDeleteMessage.getTo(),
                 gson.toJson(jfmsServerGroupDeleteMessage)
         );
-        messageHistoryGroupApi.deleteGroupMessage(
+        messageHistoryApiFactory.getGroupApi().deleteGroupMessage(
                 jfmsClientGroupDeleteMessage.getTo(),
                 jfmsClientGroupDeleteMessage.getIdList()
         );
