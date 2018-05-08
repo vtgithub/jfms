@@ -10,7 +10,7 @@ import com.jfms.engine.service.biz.remote.GroupConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
 import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;
-import com.jfms.message_history.model.P2PMessage;
+import com.jfms.message_history.model.HistoryMessage;
 import com.jfms.offline_message.model.OfflineMessage;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,9 @@ public class ChatManager implements InitializingBean {
     @Autowired
     OfflineMessageApiClient offlineMessageApiClient;
     @Autowired
-    MessageHistoryApiClient messageHistoryApiClient;
+    MessageHistoryP2PApiClient messageHistoryP2PApiClient;
+    @Autowired
+    MessageHistoryGroupApi messageHistoryGroupApi;
     @Autowired
     GroupApiClient groupApiClient;
     @Autowired
@@ -85,14 +87,14 @@ public class ChatManager implements InitializingBean {
             e.printStackTrace();
             //todo log
         }
-        P2PMessage p2PMessage = MessageHistoryApiClient.getP2PMessage(
+        HistoryMessage p2PHistoryMessage = MessageHistoryP2PApiClient.getP2PHistoryMessage(
                 messageId,
                 jfmsClientSendMessage.getFrom(),
                 jfmsClientSendMessage.getBody(),
                 jfmsClientSendMessage.getSubject(),
                 jfmsClientSendMessage.getSendTime()
         );
-        messageHistoryApiClient.saveHistoryMessage(jfmsClientSendMessage.getTo(), p2PMessage);
+        messageHistoryP2PApiClient.saveP2PHistoryMessage(jfmsClientSendMessage.getTo(), p2PHistoryMessage);
     }
 
     public void editMessage(JFMSClientEditMessage jfmsClientEditMessage) {
@@ -101,14 +103,14 @@ public class ChatManager implements InitializingBean {
 
         sendOnlineOrOffline(jfmsClientEditMessage.getTo(), gson.toJson(jfmsServerEditMessage));
 
-        P2PMessage p2PMessage = MessageHistoryApiClient.getP2PMessage(
+        HistoryMessage p2PHistoryMessage = MessageHistoryP2PApiClient.getP2PHistoryMessage(
                 jfmsClientEditMessage.getId(),
                 jfmsClientEditMessage.getFrom(),
                 jfmsClientEditMessage.getBody(),
                 jfmsClientEditMessage.getSubject(),
                 jfmsClientEditMessage.getEditTime()
         );
-        messageHistoryApiClient.UpdateHistoryMessage(jfmsClientEditMessage.getTo(), p2PMessage);
+        messageHistoryP2PApiClient.updateP2PHistoryMessage(jfmsClientEditMessage.getTo(), p2PHistoryMessage);
     }
 
     public void deleteMessage(JFMSClientDeleteMessage jfmsClientDeleteMessage) {
@@ -117,9 +119,9 @@ public class ChatManager implements InitializingBean {
 
         sendOnlineOrOffline(jfmsClientDeleteMessage.getTo(), gson.toJson(jfmsServerDeleteMessage));
 
-        messageHistoryApiClient.deleteP2PMessage(
+        messageHistoryP2PApiClient.deleteP2PMessage(
                 jfmsClientDeleteMessage.getTo(),
-                Arrays.asList(jfmsClientDeleteMessage.getId())
+                jfmsClientDeleteMessage.getIdList()
         );
     }
 
@@ -223,6 +225,8 @@ public class ChatManager implements InitializingBean {
                 jfmsClientGroupInfoEditMessage.getType()
         );
         groupApiClient.editGroup(groupInfo);
+        GroupInfoEntity groupInfoEntity = groupConverter.getEntityFromJFMSMessage(jfmsClientGroupInfoEditMessage);
+        groupRepository.saveGroupInfo(groupInfo.getId(), groupInfoEntity);
         sendGroupCreationOrInfoUpdateMessageToMembers(
                 jfmsMessageConverter.clientGroupInfoEditToServerGroupCreation(jfmsClientGroupInfoEditMessage)
         );
@@ -230,7 +234,6 @@ public class ChatManager implements InitializingBean {
 
 
     public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
-
         String messageId = UUID.randomUUID().toString();
         JFMSServerSendMessage jfmsServerSendMessage =
                 jfmsMessageConverter.clientSendToServerSend(messageId, jfmsClientGroupSendMessage);
@@ -246,7 +249,14 @@ public class ChatManager implements InitializingBean {
             e.printStackTrace();
             //todo log
         }
-        //todo group message history
+        HistoryMessage groupHistoryMessage = MessageHistoryGroupApi.getGroupHistoryMessage(
+                messageId,
+                jfmsClientGroupSendMessage.getFrom(),
+                jfmsClientGroupSendMessage.getBody(),
+                jfmsClientGroupSendMessage.getSubject(),
+                jfmsClientGroupSendMessage.getSendTime()
+        );
+        messageHistoryGroupApi.saveGroupHistoryMessage(jfmsClientGroupSendMessage.getTo(), groupHistoryMessage);
     }
 
     public void editGroupMessage(JFMSClientEditMessage jfmsClientGroupEditMessage){
@@ -257,7 +267,14 @@ public class ChatManager implements InitializingBean {
                 jfmsClientGroupEditMessage.getTo(),
                 gson.toJson(jfmsServerGroupEditMessage)
         );
-        //todo group message history
+        HistoryMessage groupHistoryMessage = MessageHistoryGroupApi.getGroupHistoryMessage(
+                jfmsClientGroupEditMessage.getId(),
+                jfmsClientGroupEditMessage.getFrom(),
+                jfmsClientGroupEditMessage.getBody(),
+                jfmsClientGroupEditMessage.getSubject(),
+                jfmsClientGroupEditMessage.getEditTime()
+        );
+        messageHistoryGroupApi.updateGroupHistoryMessage(jfmsClientGroupEditMessage.getTo(), groupHistoryMessage);
     }
 
     public void deleteGroupMessage(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage){
@@ -268,7 +285,10 @@ public class ChatManager implements InitializingBean {
                 jfmsClientGroupDeleteMessage.getTo(),
                 gson.toJson(jfmsServerGroupDeleteMessage)
         );
-        //todo group delete message history
+        messageHistoryGroupApi.deleteGroupMessage(
+                jfmsClientGroupDeleteMessage.getTo(),
+                jfmsClientGroupDeleteMessage.getIdList()
+        );
     }
 
     public void groupIsTypingMessage(JFMSClientIsTypingMessage jfmsClientGroupIsTypingMessage) {

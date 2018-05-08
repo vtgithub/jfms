@@ -16,13 +16,13 @@ public class P2PHistoryApiImpl implements P2PHistoryApi {
     @Autowired
     private P2PService p2PService;
 
-    public @ResponseBody void saveHistoryMessage(
+    public @ResponseBody void saveP2PHistoryMessage(
             @PathVariable("userId") String userId, @RequestBody HistoryMessage messageForHistory) {
         p2PService.saveMessage(userId, messageForHistory);
 
     }
 
-    public @ResponseBody void UpdateHistoryMessage(
+    public @ResponseBody void UpdateP2PHistoryMessage(
             @PathVariable("userId") String userId, @RequestBody HistoryMessage messageForUpdate) {
         p2PService.editMessage(userId, messageForUpdate);
     }

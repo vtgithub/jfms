@@ -1,3 +1,4 @@
-/home/vahid/repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/model/P2PMessageRequest.java
-/home/vahid/repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/model/P2PMessage.java
-/home/vahid/repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/MessageHistoryApi.java
+/home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/P2PHistoryApi.java
+/home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/GroupHistoryApi.java
+/home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/model/HistoryMessage.java
+/home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/model/HistoryMessageRequest.java

@@ -16,13 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 public interface UserApi {
 
     @RequestMapping(method = RequestMethod.POST, value = "/register")
-    void registerUser(@RequestBody UserRegistrationRequest userRegistrationRequest, HttpServletResponse response);
+    void registerUser(@RequestBody UserRegistrationRequest userRegistrationRequest);
 
     @RequestMapping(method = RequestMethod.POST, value = "/activate")
     UserActivationResponse activateUser(@RequestBody UserActivationRequest userActivationRequest);
 
     @RequestMapping(method = RequestMethod.POST, value = "/activation/code")
-    void activationCode(@RequestBody ActivationCodeRequest activationCodeRequest, HttpServletResponse response);
+    void activationCode(@RequestBody ActivationCodeRequest activationCodeRequest);
 
     @RequestMapping(method = RequestMethod.GET, value = "/reactivate")
     UserActivationResponse doReactivate(@RequestHeader("auth") String oldToken);

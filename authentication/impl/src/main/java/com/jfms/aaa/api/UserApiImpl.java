@@ -8,6 +8,7 @@ import com.jfms.aaa.model.UserActivationRequest;
 import com.jfms.aaa.model.UserActivationResponse;
 import com.jfms.aaa.model.UserRegistrationRequest;
 import com.jfms.aaa.service.ActivationService;
+import com.jfms.aaa.service.TooRequestException;
 import com.jfms.aaa.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,16 +28,13 @@ public class UserApiImpl implements UserApi{
 
 //    @RequestMapping(method = RequestMethod.POST, value = "/register")
     public @ResponseBody void registerUser(
-            @RequestBody UserRegistrationRequest userRegistrationRequest, HttpServletResponse httpServletResponse){
-
+            @RequestBody UserRegistrationRequest userRegistrationRequest){
         try {
             userService.register(userRegistrationRequest);
-        } catch (Exception e) {
-            httpServletResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        } catch (TooRequestException e) {
             e.printStackTrace();
-            //todo log
+            throw new TooManyRequestException(e);
         }
-
     }
 
 
@@ -48,19 +46,17 @@ public class UserApiImpl implements UserApi{
 
 //    @RequestMapping(method = RequestMethod.POST, value = "/activation/code")
     public @ResponseBody void activationCode(
-            @RequestBody ActivationCodeRequest activationCodeRequest, HttpServletResponse httpServletResponse) {
+            @RequestBody ActivationCodeRequest activationCodeRequest) {
 
         try {
             activationService.generateActivationCode(
                     activationCodeRequest.getActivationCodeLength(),
                     activationCodeRequest.getMobileNumber()
             );
-        } catch (Exception e) {
-            httpServletResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        } catch (TooRequestException e) {
             e.printStackTrace();
-            //todo log
+            throw new TooManyRequestException(e);
         }
-
 
     }
 //    @RequestMapping(method = RequestMethod.GET, value = "/reactivate")

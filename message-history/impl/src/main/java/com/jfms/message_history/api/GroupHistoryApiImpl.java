@@ -19,17 +19,17 @@ public class GroupHistoryApiImpl implements GroupHistoryApi{
     @Autowired
     private GroupService groupService;
 
-    public @ResponseBody void saveHistoryMessage(
+    public @ResponseBody void saveGroupHistoryMessage(
             @PathVariable("groupId") String groupId, @RequestBody HistoryMessage messageForHistory) {
         groupService.saveMessage(groupId, messageForHistory);
     }
 
-    public @ResponseBody void UpdateHistoryMessage(
+    public @ResponseBody void UpdateGroupHistoryMessage(
             @PathVariable("groupId") String groupId, @RequestBody HistoryMessage messageForUpdate) {
         groupService.editMessage(groupId, messageForUpdate);
     }
 
-    public @ResponseBody List<HistoryMessage> getUserP2PMessages(
+    public @ResponseBody List<HistoryMessage> getGroupMessages(
             @PathVariable("groupId") String groupId,
             @RequestParam("pageSize") Integer pageSize,
             @RequestParam("pageNumber") Integer pageNumber) {
@@ -38,7 +38,7 @@ public class GroupHistoryApiImpl implements GroupHistoryApi{
 
     }
 
-    public @ResponseBody void deleteP2PMessage(
+    public @ResponseBody void deleteGroupMessage(
             @PathVariable("groupId") String groupId, @RequestBody List<String> messageIdList) {
         groupService.deleteMessages(groupId, messageIdList);
     }

@@ -1,7 +1,7 @@
 package com.jfms.aaa.api;
 
 import com.jfms.aaa.GroupApi;
-import com.jfms.aaa.dal.repository.DatabaseException;
+import com.jfms.aaa.dal.repository.NotFoundException;
 import com.jfms.aaa.model.GroupInfo;
 import com.jfms.aaa.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,18 +25,29 @@ public class GroupApiImpl implements GroupApi{
     }
 
 
-    public @ResponseBody void editGroup(GroupInfo groupInfo) {
-        groupService.editGroup(groupInfo);
+    public @ResponseBody void editGroup(GroupInfo groupInfo){
+        try {
+            groupService.editGroup(groupInfo);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            //todo log
+            throw new InvalidInputDataException(e);
+        }
     }
 
-    public @ResponseBody GroupInfo getGroup(@PathVariable("gId")  String groupId, HttpServletResponse response) {
+    public @ResponseBody GroupInfo getGroup(@PathVariable("gId")  String groupId) {
         GroupInfo groupInfo = null;
         try {
             groupInfo = groupService.getGroupInfo(groupId);
-        } catch (DatabaseException e) {
+        } catch (NotFoundException e) {
             e.printStackTrace();
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            //todo log
+            throw new InvalidInputDataException(e);
         }
         return groupInfo;
+    }
+
+    public @ResponseBody void deleteGroup(@PathVariable("gId") String groupId) {
+        groupService.deleteGroup(groupId);
     }
 }

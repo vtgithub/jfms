@@ -1,5 +1,7 @@
 package com.jfms.engine.api.model;
 
+import java.util.List;
+
 /**
  * Created by vahid on 4/9/18.
  */
@@ -7,7 +9,7 @@ public class JFMSClientDeleteMessage {
     private Integer method;
     private String from;
     private String to;
-    private  String id;
+    private List<String> idList;
 
     public Integer getMethod() {
         return method;
@@ -17,12 +19,12 @@ public class JFMSClientDeleteMessage {
         this.method = method;
     }
 
-    public String getId() {
-        return id;
+    public List<String> getIdList() {
+        return idList;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setIdList(List<String> idList) {
+        this.idList = idList;
     }
 
     public String getFrom() {

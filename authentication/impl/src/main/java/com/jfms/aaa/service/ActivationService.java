@@ -53,12 +53,8 @@ public class ActivationService {
 
     public void generateActivationCode(Integer codeLength, String mobileNumber) throws TooRequestException {
         ActivationEntity activationEntity = null;
-        try {
-            activationEntity = activationRepository.findTopByMobileNumberOrderByCreationTimeDesc(mobileNumber);
-        }catch (Exception e){
-            e.printStackTrace();
-            //todo log
-        }
+        activationEntity = activationRepository.findTopByMobileNumberOrderByCreationTimeDesc(mobileNumber);
+
         if (activationEntity != null && activationEntity.getUsed() == false && System.currentTimeMillis() - activationEntity.getCreationTime() < 60000 )
             throw new TooRequestException();
         String activationCode = randomGenerator.getRandomNumber(codeLength);

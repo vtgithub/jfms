@@ -30,7 +30,7 @@ public class JFMSMessageConverter {
             return null;
         return new JFMSServerDeleteMessage(
                     jfmsClientDeleteMessage.getMethod(),
-                    jfmsClientDeleteMessage.getId(),
+                    jfmsClientDeleteMessage.getIdList(),
                     jfmsClientDeleteMessage.getFrom()
                 );
     }
