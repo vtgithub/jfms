@@ -22,7 +22,7 @@ public class P2PHistoryApiImpl implements P2PHistoryApi {
 
     }
 
-    public @ResponseBody void UpdateP2PHistoryMessage(
+    public @ResponseBody void updateP2PHistoryMessage(
             @PathVariable("userId") String userId, @RequestBody HistoryMessage messageForUpdate) {
         p2PService.editMessage(userId, messageForUpdate);
     }

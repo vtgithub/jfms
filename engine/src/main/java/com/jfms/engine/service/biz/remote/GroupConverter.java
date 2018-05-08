@@ -1,9 +1,12 @@
 package com.jfms.engine.service.biz.remote;
 
+import com.jfms.aaa.model.GroupMember;
 import com.jfms.engine.api.model.JFMSClientGroupCreationMessage;
 import com.jfms.engine.api.model.JFMSClientGroupInfoEditMessage;
 import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class GroupConverter {
@@ -24,4 +27,6 @@ public class GroupConverter {
                 jfmsClientGroupInfoEditMessage.getType()
         );
     }
+
+
 }

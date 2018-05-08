@@ -9,7 +9,6 @@ import com.jfms.engine.dal.UserSessionRepository;
 import com.jfms.engine.service.biz.remote.GroupConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
-import com.jfms.engine.service.biz.remote.api.aaa.GroupApiClient;
 import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryGroupApiClient;
 import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryP2PApiClient;
 import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;
@@ -331,7 +330,7 @@ public class ChatManager implements InitializingBean {
 
     private void sendGroupOnlineOrOffline(String from, String groupId, String message) {
         GroupInfoEntity groupInfoEntity = groupRepository.getGroupInfo(groupId);
-        if (!groupInfoEntity.contains(from))
+        if (!groupInfoEntity.getJfmsGroupMemberMap().containsKey(from))
             return;
         Iterator<Map.Entry<String, Boolean>> groupIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
         while (groupIterator.hasNext()){

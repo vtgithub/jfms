@@ -24,7 +24,7 @@ public class GroupHistoryApiImpl implements GroupHistoryApi{
         groupService.saveMessage(groupId, messageForHistory);
     }
 
-    public @ResponseBody void UpdateGroupHistoryMessage(
+    public @ResponseBody void updateGroupHistoryMessage(
             @PathVariable("groupId") String groupId, @RequestBody HistoryMessage messageForUpdate) {
         groupService.editMessage(groupId, messageForUpdate);
     }
