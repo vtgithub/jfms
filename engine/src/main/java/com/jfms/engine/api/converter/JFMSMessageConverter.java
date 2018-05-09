@@ -74,6 +74,7 @@ public class JFMSMessageConverter {
                 jfmsClientSendMessage.getSubject(),
                 jfmsClientSendMessage.getSendTime()
         );
+
     }
 
     public JFMSServerGroupCreationMessage clientGroupCreationToServerGroupCreation(
@@ -100,5 +101,56 @@ public class JFMSMessageConverter {
                 jfmsClientGroupInfoEditMessage.getType()
         );
 
+    }
+
+
+    public JFMSServerGroupSendMessage clientSendToServerGroupSend(String messageId, JFMSClientSendMessage jfmsClientGroupSendMessage) {
+        return new JFMSServerGroupSendMessage(
+                jfmsClientGroupSendMessage.getMethod(),
+                jfmsClientGroupSendMessage.getTo(),
+                messageId,
+                jfmsClientGroupSendMessage.getFrom(),
+                jfmsClientGroupSendMessage.getBody(),
+                jfmsClientGroupSendMessage.getSubject(),
+                jfmsClientGroupSendMessage.getSendTime()
+        );
+    }
+
+    public JFMSServerGroupEditMessage clientEditToServerGroupEdit(JFMSClientEditMessage jfmsClientGroupEditMessage) {
+        return new JFMSServerGroupEditMessage(
+                jfmsClientGroupEditMessage.getId(),
+                jfmsClientGroupEditMessage.getTo(),
+                jfmsClientGroupEditMessage.getFrom(),
+                jfmsClientGroupEditMessage.getBody(),
+                jfmsClientGroupEditMessage.getSubject(),
+                jfmsClientGroupEditMessage.getEditTime(),
+                jfmsClientGroupEditMessage.getMethod()
+        );
+    }
+
+    public JFMSServerGroupDeleteMessage clientDeleteToServerGroupDelete(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage) {
+        return new JFMSServerGroupDeleteMessage(
+                jfmsClientGroupDeleteMessage.getMethod(),
+                jfmsClientGroupDeleteMessage.getTo(),
+                jfmsClientGroupDeleteMessage.getIdList(),
+                jfmsClientGroupDeleteMessage.getFrom()
+        );
+    }
+
+    public JFMSServerGroupIsTypingMessage clientIsTypingToServerGroupIsTyping(JFMSClientIsTypingMessage jfmsClientGroupIsTypingMessage) {
+        return new JFMSServerGroupIsTypingMessage(
+                jfmsClientGroupIsTypingMessage.getMethod(),
+                jfmsClientGroupIsTypingMessage.getTo(),
+                jfmsClientGroupIsTypingMessage.getFrom()
+        );
+    }
+
+    public JFMSServerGroupConversationMessage clientConversationLeaveToServerGroupConversation(JFMSClientConversationLeaveMessage jfmsClientGroupConversationLeaveMessage) {
+        return new JFMSServerGroupConversationMessage(
+                jfmsClientGroupConversationLeaveMessage.getMethod(),
+                jfmsClientGroupConversationLeaveMessage.getTo(),
+                jfmsClientGroupConversationLeaveMessage.getFrom(),
+                jfmsClientGroupConversationLeaveMessage.getLeaveTime()
+        );
     }
 }

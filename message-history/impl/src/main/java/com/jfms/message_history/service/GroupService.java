@@ -25,8 +25,7 @@ public class GroupService {
     private DalAssistant dalAssistant;
     @Autowired
     private GroupUpdateDao groupUpdateDao;
-    @Autowired
-    private P2PService p2PService;
+
 
     public void saveMessage(String groupId, HistoryMessage messageForHistory) {
         GroupEntity groupEntity = messageConverter.historyMessageToGroupEntity(groupId, messageForHistory);
@@ -67,9 +66,11 @@ public class GroupService {
     public void deleteMessages(String groupId, List<String> messageIdList) {
         for (String messageId : messageIdList) {
             GroupEntity groupEntity = groupDao.findByGroupIdAndMessageIdAndStatusGreaterThanEqualAndStatusLessThanEqual(
-                    groupId, messageId, 1, 2);
-            groupEntity.setStatus(EntityStatus.DELETED.getValue());
-            groupDao.save(groupEntity);
+                    groupId.trim(), messageId.trim(), 1, 2);
+            if (groupEntity != null){
+                groupEntity.setStatus(EntityStatus.DELETED.getValue());
+                groupDao.save(groupEntity);
+            }
         }
     }
 }

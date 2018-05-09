@@ -209,7 +209,7 @@ public class ChatManager implements InitializingBean {
 
         //todo group message History
         try {
-            session.sendMessage(new TextMessage(groupId));
+            session.sendMessage(new TextMessage("{\"goupId\":\"" + groupId+ "\"}"));
         } catch (IOException e) {
             e.printStackTrace();
             //todo log
@@ -235,12 +235,12 @@ public class ChatManager implements InitializingBean {
 
     public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
         String messageId = UUID.randomUUID().toString();
-        JFMSServerSendMessage jfmsServerSendMessage =
-                jfmsMessageConverter.clientSendToServerSend(messageId, jfmsClientGroupSendMessage);
+        JFMSServerGroupSendMessage jfmsServerGroupSendMessage =
+                jfmsMessageConverter.clientSendToServerGroupSend(messageId, jfmsClientGroupSendMessage);
         sendGroupOnlineOrOffline(
                 jfmsClientGroupSendMessage.getFrom(),
                 jfmsClientGroupSendMessage.getTo(),
-                gson.toJson(jfmsServerSendMessage)
+                gson.toJson(jfmsServerGroupSendMessage)
         );
 
         try {
@@ -260,8 +260,8 @@ public class ChatManager implements InitializingBean {
     }
 
     public void editGroupMessage(JFMSClientEditMessage jfmsClientGroupEditMessage){
-        JFMSServerEditMessage jfmsServerGroupEditMessage =
-                jfmsMessageConverter.clientEditToServerEdit(jfmsClientGroupEditMessage);
+        JFMSServerGroupEditMessage jfmsServerGroupEditMessage=
+                jfmsMessageConverter.clientEditToServerGroupEdit(jfmsClientGroupEditMessage);
         sendGroupOnlineOrOffline(
                 jfmsClientGroupEditMessage.getFrom(),
                 jfmsClientGroupEditMessage.getTo(),
@@ -278,8 +278,8 @@ public class ChatManager implements InitializingBean {
     }
 
     public void deleteGroupMessage(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage){
-        JFMSServerDeleteMessage jfmsServerGroupDeleteMessage =
-                jfmsMessageConverter.clientDeleteToServerDelete(jfmsClientGroupDeleteMessage);
+        JFMSServerGroupDeleteMessage jfmsServerGroupDeleteMessage=
+                jfmsMessageConverter.clientDeleteToServerGroupDelete(jfmsClientGroupDeleteMessage);
         sendGroupOnlineOrOffline(
                 jfmsClientGroupDeleteMessage.getFrom(),
                 jfmsClientGroupDeleteMessage.getTo(),
@@ -292,8 +292,8 @@ public class ChatManager implements InitializingBean {
     }
 
     public void groupIsTypingMessage(JFMSClientIsTypingMessage jfmsClientGroupIsTypingMessage) {
-        JFMSServerIsTypingMessage jfmsServerGroupIsTypingMessage =
-                jfmsMessageConverter.clientIsTypingToServerIsTyping(jfmsClientGroupIsTypingMessage);
+        JFMSServerGroupIsTypingMessage jfmsServerGroupIsTypingMessage =
+                jfmsMessageConverter.clientIsTypingToServerGroupIsTyping(jfmsClientGroupIsTypingMessage);
         sendGroupOnline(
                 jfmsClientGroupIsTypingMessage.getFrom(),
                 jfmsClientGroupIsTypingMessage.getTo(),
@@ -308,12 +308,12 @@ public class ChatManager implements InitializingBean {
                 jfmsClientGroupConversationLeaveMessage.getTo(),
                 jfmsClientGroupConversationLeaveMessage.getLeaveTime()
         );
-        JFMSServerConversationMessage jfmsServerConversationMessage =
-                jfmsMessageConverter.clientConversationLeaveToServerConversation(jfmsClientGroupConversationLeaveMessage);
+        JFMSServerGroupConversationMessage jfmsServerGroupConversationMessage =
+                jfmsMessageConverter.clientConversationLeaveToServerGroupConversation(jfmsClientGroupConversationLeaveMessage);
         sendGroupOnlineOrOffline(
                 jfmsClientGroupConversationLeaveMessage.getFrom(),
                 jfmsClientGroupConversationLeaveMessage.getTo(),
-                gson.toJson(jfmsServerConversationMessage)
+                gson.toJson(jfmsServerGroupConversationMessage)
         );
 
     }
@@ -335,7 +335,8 @@ public class ChatManager implements InitializingBean {
         Iterator<Map.Entry<String, Boolean>> groupIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
         while (groupIterator.hasNext()){
             Map.Entry<String, Boolean> next = groupIterator.next();
-            sendOnlineOrOffline(next.getKey(), message);
+            if (!next.getKey().equals(from))
+                sendOnlineOrOffline(next.getKey(), message);
         }
     }
 
@@ -357,7 +358,8 @@ public class ChatManager implements InitializingBean {
         Iterator<Map.Entry<String, Boolean>> gIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
         while (gIterator.hasNext()){
             Map.Entry<String, Boolean> next = gIterator.next();
-            sendOnline(next.getKey(), message);
+            if (!next.getKey().equals(from))
+                sendOnline(next.getKey(), message);
         }
     }
 
