@@ -9,9 +9,9 @@ public class GroupInfoEntity implements Serializable{
     private String displayName;
     private String creator;
     private Map<String, Boolean> jfmsGroupMemberMap;
-    private Integer type;
+    private Byte type;
 
-    public GroupInfoEntity(String displayName, String creator, Map<String, Boolean> jfmsGroupMemberMap, Integer type) {
+    public GroupInfoEntity(String displayName, String creator, Map<String, Boolean> jfmsGroupMemberMap, Byte type) {
         this.displayName = displayName;
         this.creator = creator;
         this.jfmsGroupMemberMap = jfmsGroupMemberMap;
@@ -45,11 +45,11 @@ public class GroupInfoEntity implements Serializable{
         this.jfmsGroupMemberMap = jfmsGroupMemberMap;
     }
 
-    public Integer getType() {
+    public Byte getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(Byte type) {
         this.type = type;
     }
 

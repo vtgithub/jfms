@@ -15,7 +15,7 @@ public class GroupConverter {
                 jfmsClientGroupCreationMessage.getDisplayName(),
                 jfmsClientGroupCreationMessage.getCreator(),
                 jfmsClientGroupCreationMessage.getJfmsGroupMemberMap(),
-                jfmsClientGroupCreationMessage.getType()
+                jfmsClientGroupCreationMessage.getType().byteValue()
         );
     }
 
@@ -24,7 +24,7 @@ public class GroupConverter {
                 jfmsClientGroupInfoEditMessage.getDisplayName(),
                 jfmsClientGroupInfoEditMessage.getCreator(),
                 jfmsClientGroupInfoEditMessage.getJfmsGroupMemberMap(),
-                jfmsClientGroupInfoEditMessage.getType()
+                jfmsClientGroupInfoEditMessage.getType().byteValue()
         );
     }
 
