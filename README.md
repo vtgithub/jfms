@@ -13,7 +13,7 @@ port number is `6070`.
 | `POST` | `aaa/group` | {`id`, `displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | --- | `groupId` | register a new group in system and return groupId. |
 | `PUT` | `aaa/group` | {`id`, `displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | --- | --- | update group info. |
 | `GET` | `aaa/group/{gId}` | --- | --- |  {`displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | returns `groupInfo` belongs to the `gId`. |
-| `DELETE` | `aaa/group/{gId}` | --- | --- |  --- | delete group info |
+| `DELETE` | `aaa/group/{gId}` | --- | --- |  --- | chage status of group info to deleted|
 
 ## offline-message
 port number is `7070`.
@@ -28,10 +28,14 @@ port number is `7080`.
 
 | Method | URL | Body | Header | Return value | description |
 | --- | --- | --- | --- | --- | -- |
-| `POST` | `history/p2p/{userId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | saves `P2PMessage` |
+| `POST` | `history/p2p/{userId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | saves `HistoryMessage` into p2p |
 | `PUT` | `history/p2p/{userId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | change status of seved message to updated and insert a field into `P2PUpdateEntity`. |
-| `POST` | `history/p2p/{userId}/{rouster}` | {`pageNumber`, `pageSize`} | --- | [{`messageId`, `sender`, `body`, `subject`, `time`} , ...] | returns `pageSize` number of `P2PMessages` from reord multiple  of `pageNumber` and `pageSize` |
+| `GET` | `history/p2p/{userId}/{rouster}` | --- | `pageNumber` ,`pageSize` as query params | [{`messageId`, `sender`, `body`, `subject`, `time`} , ...] | returns `pageSize` number of `P2PMessages` from reord multiple  of `pageNumber` and `pageSize` |
 | `DELETE` | `history/p2p/{userId}` | [`messageId`, ...] | --- | --- | change status of saved message to deleted. |
+| `POST` | `history/group/{groupId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | saves `HistoryMessage` into group |
+| `PUT` | `history/group/{groupId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | change status of seved message to updated and insert a field into `GroupUpdateEntity`. |
+| `GET` | `history/group/{groupId}` | --- | `pageNumber` ,`pageSize` as query params | [{`messageId`, `sender`, `body`, `subject`, `time`} , ...] | returns `pageSize` number of `HistoryMessages` from reord multiple  of `pageNumber` and `pageSize` |
+| `DELETE` | `history/group/{groupId}` | [`messageId`, ...] | --- | --- | change status of saved message to deleted. |
 
 ## engine
 websocket port number is `4042`.
