@@ -10,8 +10,10 @@ port number is `6070`.
 | `POST` | `aaa/user/activate` | {`activationCode`, `mobileNumber`} | --- | {`token`} | return a jwt token to user |
 | `POST` | `aaa/user/activation/code` | {`mobileNumber`, `activationCodeLength`} | --- | --- | send an `activation code` to user vis sms |
 | `GET` | `aaa/user/reactivate` | --- | `auth` | {`token`} | return a jwt token to user |
-| `POST` | `aaa/group` | {`displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | --- | `groupId` | register a new group in system and return groupId. |
-| `GET` | `aaa/group/{gId}` | --- | --- |  {`displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | returns `groupInfo` belongs to the `gId`. | 
+| `POST` | `aaa/group` | {`id`, `displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | --- | `groupId` | register a new group in system and return groupId. |
+| `PUT` | `aaa/group` | {`id`, `displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | --- | --- | update group info. |
+| `GET` | `aaa/group/{gId}` | --- | --- |  {`displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | returns `groupInfo` belongs to the `gId`. |
+| `DELETE` | `aaa/group/{gId}` | --- | --- |  --- | delete group info |
 
 ## offline-message
 port number is `7070`.
