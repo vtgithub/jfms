@@ -13,6 +13,7 @@ public class HistoryMessage {
         this.body = body;
         this.subject = subject;
         this.time = time;
+
     }
 
     public HistoryMessage() {
