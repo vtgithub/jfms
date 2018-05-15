@@ -1,6 +1,6 @@
 package com.jfms.engine.service.biz;
 
-import com.google.gson.Gson;
+import com.google.gson  .Gson;
 import com.jfms.aaa.model.GroupInfo;
 import com.jfms.engine.api.Method;
 import com.jfms.engine.api.converter.JFMSMessageConverter;

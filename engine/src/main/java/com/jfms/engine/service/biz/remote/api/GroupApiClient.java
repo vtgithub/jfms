@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
+//serviceId = "aaa-server"
 @FeignClient(name = "group-api", url = "localhost:6070")
 public interface GroupApiClient extends GroupApi{
     static GroupInfo getGroupInfo(

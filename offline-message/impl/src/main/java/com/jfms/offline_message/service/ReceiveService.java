@@ -8,6 +8,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.stereotype.Component;
 
@@ -20,13 +21,14 @@ import java.util.Properties;
  * Created by vahid on 4/16/18.
  */
 @Component
+@EnableKafka
 public class ReceiveService {
 
     @Autowired
     KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+//    @Autowired
     private KafkaConsumer<String, String> receiver;
     private Properties props;
-    private Gson gson = new Gson();
     @Autowired
     public ReceiveService(@Value("${kafka.bootstrap-servers}") String serverAddress){
         props = new Properties();

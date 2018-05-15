@@ -14,7 +14,7 @@ public class Receiver {
 //    return latch;
 //  }
 
-//  @KafkaListener(topics = "${kafka.topic.helloworld}")
+  //  @KafkaListener(topics = "${kafka.topic.helloworld}")
   public String receive(String payload) {
     System.out.println("received payload='{}'" +payload);
 //    LOGGER.info("received payload='{}'", payload);

@@ -4,6 +4,8 @@ import com.jfms.message_history.P2PHistoryApi;
 import com.jfms.message_history.model.HistoryMessage;
 import org.springframework.cloud.netflix.feign.FeignClient;
 
+//url = "localhost:7080"
+//serviceId = "message-history-server"
 @FeignClient(name = "message-history-api", url = "localhost:7080")
 public interface MessageHistoryP2PApiClient extends P2PHistoryApi{
 

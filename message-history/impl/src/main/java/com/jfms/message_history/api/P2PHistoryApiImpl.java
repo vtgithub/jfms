@@ -19,12 +19,13 @@ public class P2PHistoryApiImpl implements P2PHistoryApi {
     public @ResponseBody void saveP2PHistoryMessage(
             @PathVariable("userId") String userId, @RequestBody HistoryMessage messageForHistory) {
         p2PService.saveMessage(userId, messageForHistory);
-
+        System.out.println("p2p message has been saved successfully");
     }
 
     public @ResponseBody void updateP2PHistoryMessage(
             @PathVariable("userId") String userId, @RequestBody HistoryMessage messageForUpdate) {
         p2PService.editMessage(userId, messageForUpdate);
+        System.out.println("p2p message has been updated successfully");
     }
 
     public @ResponseBody List<HistoryMessage> getUserP2PMessages(@PathVariable("userId") String userId,
@@ -33,12 +34,14 @@ public class P2PHistoryApiImpl implements P2PHistoryApi {
                                                                  @RequestParam("pageNumber") Integer pageNumber) {
         List<HistoryMessage> historyMessageList = p2PService.getUserP2PMessages(
                 userId, rosterId, pageSize, pageNumber);
+        System.out.println("p2p message has been fetched successfully");
         return historyMessageList;
     }
 
     public @ResponseBody void deleteP2PMessage(
             @PathVariable("userId") String userId, @RequestBody List<String> messageIdList) {
         p2PService.deleteP2PMessage(userId, messageIdList);
+        System.out.println("p2p message has been deleted successfully");
     }
 
 }

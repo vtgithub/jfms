@@ -4,6 +4,8 @@ import com.jfms.message_history.GroupHistoryApi;
 import com.jfms.message_history.model.HistoryMessage;
 import org.springframework.cloud.netflix.feign.FeignClient;
 
+// url = "localhost:7080"
+//serviceId = "message-history-server"
 @FeignClient(name = "message-history-api", url = "localhost:7080")
 public interface        MessageHistoryGroupApiClient extends GroupHistoryApi{
 

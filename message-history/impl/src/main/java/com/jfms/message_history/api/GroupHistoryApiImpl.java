@@ -22,11 +22,13 @@ public class GroupHistoryApiImpl implements GroupHistoryApi{
     public @ResponseBody void saveGroupHistoryMessage(
             @PathVariable("groupId") String groupId, @RequestBody HistoryMessage messageForHistory) {
         groupService.saveMessage(groupId, messageForHistory);
+        System.out.println("group message has been saved successfully");
     }
 
     public @ResponseBody void updateGroupHistoryMessage(
             @PathVariable("groupId") String groupId, @RequestBody HistoryMessage messageForUpdate) {
         groupService.editMessage(groupId, messageForUpdate);
+        System.out.println("group message has been updated successfully");
     }
 
     public @ResponseBody List<HistoryMessage> getGroupMessages(
@@ -34,12 +36,13 @@ public class GroupHistoryApiImpl implements GroupHistoryApi{
             @RequestParam("pageSize") Integer pageSize,
             @RequestParam("pageNumber") Integer pageNumber) {
         List<HistoryMessage> historyMessageList = groupService.getGroupMessages(groupId, pageSize, pageNumber);
+        System.out.println("group message has been fetched successfully");
         return historyMessageList;
-
     }
 
     public @ResponseBody void deleteGroupMessage(
             @PathVariable("groupId") String groupId, @RequestBody List<String> messageIdList) {
         groupService.deleteMessages(groupId, messageIdList);
+        System.out.println("group message has been deleted successfully");
     }
 }
