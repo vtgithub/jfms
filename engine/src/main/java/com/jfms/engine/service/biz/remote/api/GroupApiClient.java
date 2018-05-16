@@ -4,15 +4,16 @@ package com.jfms.engine.service.biz.remote.api;
 import com.jfms.aaa.GroupApi;
 import com.jfms.aaa.model.GroupInfo;
 import com.jfms.aaa.model.GroupMember;
-import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.cloud.openfeign.FeignClient;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+//url = "localhost:6070"
 //serviceId = "aaa-server"
-@FeignClient(name = "group-api", url = "localhost:6070")
+@FeignClient(name = "group-api", serviceId = "aaa-server")
 public interface GroupApiClient extends GroupApi{
     static GroupInfo getGroupInfo(
             String displayName, String creator, Map<String, Boolean> jfmsGroupMemberMap, Integer type) {

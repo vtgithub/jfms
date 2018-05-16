@@ -2,8 +2,15 @@ com/jfms/message_history/dal/dao/P2PUpdateDao.class
 com/jfms/message_history/dal/EntityStatus.class
 com/jfms/message_history/dal/entity/P2PUpdateEntity.class
 com/jfms/message_history/dal/dao/P2PDao.class
+com/jfms/message_history/api/P2PHistoryApiImpl.class
+com/jfms/message_history/dal/entity/GroupEntity.class
 com/jfms/message_history/converter/MessageConverter.class
+com/jfms/message_history/dal/dao/GroupDao.class
 com/jfms/message_history/MessageHistoryApplication.class
 com/jfms/message_history/dal/entity/P2PEntity.class
+com/jfms/message_history/dal/dao/GroupUpdateDao.class
 com/jfms/message_history/service/P2PService.class
+com/jfms/message_history/service/GroupService.class
 com/jfms/message_history/dal/DalAssistant.class
+com/jfms/message_history/dal/entity/GroupUpdateEntity.class
+com/jfms/message_history/api/GroupHistoryApiImpl.class
