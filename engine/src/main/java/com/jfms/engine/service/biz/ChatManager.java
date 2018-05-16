@@ -6,6 +6,7 @@ import com.jfms.engine.api.Method;
 import com.jfms.engine.api.converter.JFMSMessageConverter;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
+import com.jfms.engine.service.biz.remote.FallbackHandler;
 import com.jfms.engine.service.biz.remote.GroupConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
@@ -61,10 +62,11 @@ public class ChatManager implements InitializingBean {
         onlineMessageRepository.setMessageListener(onlineMessageListener);
     }
 
-
     public void init(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
         userSessionRepository.addSession(jfmsClientLoginMessage.getUserName(), session);
         presenceRepository.setPresenceStatus(jfmsClientLoginMessage.getUserName(), UserStatus.ONLINE.getValue());
+//        List<String> offlineMessageList =
+//                offlineMessageApiClient.fallbackSupportedConsumeMessage(jfmsClientLoginMessage.getUserName());
         List<String> offlineMessageList =
                 offlineMessageApiClient.consumeMessage(jfmsClientLoginMessage.getUserName());
         String offlineMessageListInJson = gson.toJson(offlineMessageList, List.class);
@@ -377,5 +379,10 @@ public class ChatManager implements InitializingBean {
         else
             return to + from;
 
+    }
+
+    public void initFallback(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
+        //todo handle business & log exception
+        System.out.println("_______ init failed ________");
     }
 }

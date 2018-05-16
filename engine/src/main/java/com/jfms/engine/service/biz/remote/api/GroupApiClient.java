@@ -13,8 +13,9 @@ import java.util.Map;
 
 //url = "localhost:6070"
 //serviceId = "aaa-server"
-@FeignClient(name = "group-api", serviceId = "aaa-server")
+@FeignClient(name = "group-api", serviceId = "aaa-server", fallbackFactory = GroupApiClientFallbackFactory.class)
 public interface GroupApiClient extends GroupApi{
+
     static GroupInfo getGroupInfo(
             String displayName, String creator, Map<String, Boolean> jfmsGroupMemberMap, Integer type) {
         List<GroupMember> groupMembers = new ArrayList<>();

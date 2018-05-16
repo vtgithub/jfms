@@ -6,8 +6,11 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 // url = "localhost:7080"
 //serviceId = "message-history-server"
-@FeignClient(name = "message-history-api", serviceId = "message-history-server")
-public interface        MessageHistoryGroupApiClient extends GroupHistoryApi{
+@FeignClient(name = "message-history-api",
+        serviceId = "message-history-server",
+        fallbackFactory = MessageHistoryGroupApiClientFallback.class
+)
+public interface MessageHistoryGroupApiClient extends GroupHistoryApi{
 
     static HistoryMessage getGroupHistoryMessage(String messageId, String sender, String body, String subject, Long time){
         return new HistoryMessage(messageId, sender, body, subject, time);

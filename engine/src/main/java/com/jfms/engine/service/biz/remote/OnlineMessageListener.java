@@ -3,7 +3,6 @@ package com.jfms.engine.service.biz.remote;
 import com.google.gson.Gson;
 import com.jfms.engine.api.model.JFMSServerSendMessage;
 import com.jfms.engine.dal.UserSessionRepository;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;

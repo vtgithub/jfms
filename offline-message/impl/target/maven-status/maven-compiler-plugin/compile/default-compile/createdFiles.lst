@@ -2,6 +2,6 @@ com/jfms/offline_message/service/Receiver.class
 com/jfms/offline_message/api/OfflineMessageApiImpl.class
 com/jfms/offline_message/service/ReceiveService.class
 com/jfms/offline_message/OfflineMessageApplication.class
-com/jfms/offline_message/service/SenderConfig.class
 com/jfms/offline_message/service/ReceiverConfig.class
+com/jfms/offline_message/service/SenderConfig.class
 com/jfms/offline_message/service/SendService.class

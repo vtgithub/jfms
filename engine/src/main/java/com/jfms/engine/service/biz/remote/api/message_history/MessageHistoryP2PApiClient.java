@@ -6,7 +6,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 //url = "localhost:7080"
 //serviceId = "message-history-server"
-@FeignClient(name = "message-history-api", serviceId = "message-history-server")
+@FeignClient(name = "message-history-api",
+        serviceId = "message-history-server",
+        fallbackFactory = MessageHistoryP2PApiClientFallback.class
+)
 public interface MessageHistoryP2PApiClient extends P2PHistoryApi{
 
     static HistoryMessage getP2PHistoryMessage(String messageId, String sender, String body, String subject, Long time){
