@@ -37,6 +37,9 @@ port number is `7080`.
 | `GET` | `history/group/{groupId}` | --- | `pageNumber` ,`pageSize` as query params | [{`messageId`, `sender`, `body`, `subject`, `time`} , ...] | returns `pageSize` number of `HistoryMessages` from reord multiple  of `pageNumber` and `pageSize` |
 | `DELETE` | `history/group/{groupId}` | [`messageId`, ...] | --- | --- | change status of saved message to deleted. |
 
+## eureka-server
+port number is `9090`
+
 ## engine
 websocket port number is `4042`.
 
