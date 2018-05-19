@@ -2,7 +2,9 @@ package com.jfms.engine.service.biz.remote.api;
 
 import com.jfms.aaa.model.GroupInfo;
 import feign.hystrix.FallbackFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class GroupApiClientFallbackFactory implements FallbackFactory<GroupApiClient>{
     @Override
     public GroupApiClient create(Throwable throwable) {

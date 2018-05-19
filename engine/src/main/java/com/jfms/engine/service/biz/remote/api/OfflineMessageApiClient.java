@@ -12,7 +12,8 @@ import java.util.List;
 // url = "localhost:7070"
 // serviceId = "offline-message-server"
 @FeignClient(name = "offline-message-api",
-        serviceId = "offline-message-server", fallbackFactory = OfflineMessageApiClientFallbackFactory.class
+        serviceId = "offline-message-server",
+        fallbackFactory = OfflineMessageApiClientFallbackFactory.class
 )
 @RequestMapping(value = "/offline", produces = "application/json", consumes = "application/json")
 public interface OfflineMessageApiClient extends OfflineMessageApi {

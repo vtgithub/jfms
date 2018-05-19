@@ -2,9 +2,10 @@ package com.jfms.engine.service.biz.remote.api.message_history;
 
 import com.jfms.message_history.model.HistoryMessage;
 import feign.hystrix.FallbackFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
+@Component
 public class MessageHistoryP2PApiClientFallback implements FallbackFactory<MessageHistoryP2PApiClient>{
     @Override
     public MessageHistoryP2PApiClient create(Throwable throwable) {
