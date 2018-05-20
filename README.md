@@ -43,16 +43,16 @@ port number is `9090`
 ## engine
 websocket port number is `4042`.
 
-|  body | response | description |
-| --- | --- | --- |
-| {`method`, `userName`} | [`JFMSServerSendMessage`,...] | `JFMSClientLoginMessage` is sending to engine. The Session is adding to the `userSessionMap`.|
-| {`method`, `from`, `to`, `body`, `subject`, `sendTime`} | {`id`} | `JFMSClientSendMessage` is sending to engine. `RedisChannelEntity` or {`id`, `from`, `to`, `message`, `subject`, `sendTime`} is creating from `JFMSClientSendMessage` and is adding to redis channel by name [`max(from , to)`+`min(from, to))`] and listener get it from channel, get session by `to` field from `userSessionMap` and send `JFMSServerSendMessage` or {`id`, `from`, `body`, `subject`, `sendTime`} to the `to` userName.|
-| {`method`, `from`, `to`, `body`, `subject`, `editTime`, `id`} | --- | `JFMSClientEditMessage` is sending to engine. message history is updating previouse value of message by the `id`, convert it to `JFMSServerEditMessage` and send it to the `to` fileld |
-| {`method`, `from` , `id`} | --- | `JFMSClientDeleteMessage` is sending to engine. The message is removing from history , convert it to `JFMSServerDeleteMessage` and send it to the `to` fileld |
-| {`method`, `from`, `to`} | --- | `JFMSClientIsTypingMessage` is sending to engine. Engine generate `JFMSClientIsTypingMessage` from that and sent it to the `to` field. |
-| {`method`, `from`} | {`status`:`OK`} | `JFMSClientPingMessage` is sending to engine and engine send back {`status`:`OK`} |
-| {`method`, `from`, `to`, `leaveTime`} | --- | `JFMSClientConversationLeaveMessage` is sending to engine by user leaving conversation. Engine update value of `last_seen_hash` map and send `JFMSServerConversationMessage` to the `to` field. |
-| {`method`, `from`, `to`} | {`from`, `leaveTime`} | `JFMSClientConversationInMessage` is sending to engine by user come into conversation. Engine get leave time of user `to` from `last_seen_hash` map and send back `JFMSServerConversationMessage`. |
-| {`method`, `from`, `to`, [`messageIdList`], `seenTime`} | --- | `JFMSClientSeenMessage` is sending to engine, `JFMSServerSeenMessage` generated from it and send to `to` field. | 
+| type |  body | response | description |
+| --- | --- | --- | --- |
+| `JFMSClientLoginMessage` | {`method`, `userName`} | [`JFMSServerSendMessage`,...] | `JFMSClientLoginMessage` is sending to engine. The Session is adding to the `userSessionMap`.|
+| `JFMSClientSendMessage` | {`method`, `from`, `to`, `body`, `subject`, `sendTime`} | {`id`} | `JFMSClientSendMessage` is sending to engine. `RedisChannelEntity` or {`id`, `from`, `to`, `message`, `subject`, `sendTime`} is creating from `JFMSClientSendMessage` and is adding to redis channel by name [`max(from , to)`+`min(from, to))`] and listener get it from channel, get session by `to` field from `userSessionMap` and send `JFMSServerSendMessage` or {`id`, `from`, `body`, `subject`, `sendTime`} to the `to` userName.|
+| `JFMSClientEditMessage` | {`method`, `from`, `to`, `body`, `subject`, `editTime`, `id`} | --- | `JFMSClientEditMessage` is sending to engine. message history is updating previouse value of message by the `id`, convert it to `JFMSServerEditMessage` and send it to the `to` fileld |
+| `JFMSClientDeleteMessage` | {`method`, `from` , `id`} | --- | `JFMSClientDeleteMessage` is sending to engine. The message is removing from history , convert it to `JFMSServerDeleteMessage` and send it to the `to` fileld |
+| `JFMSClientIsTypingMessage` | {`method`, `from`, `to`} | --- | `JFMSClientIsTypingMessage` is sending to engine. Engine generate `JFMSClientIsTypingMessage` from that and sent it to the `to` field. |
+| `JFMSClientPingMessage` | {`method`, `from`} | {`status`:`OK`} | `JFMSClientPingMessage` is sending to engine and engine send back {`status`:`OK`} |
+| `JFMSClientConversationLeaveMessage` | {`method`, `from`, `to`, `leaveTime`} | --- | `JFMSClientConversationLeaveMessage` is sending to engine by user leaving conversation. Engine update value of `last_seen_hash` map and send `JFMSServerConversationMessage` to the `to` field. |
+| `JFMSClientConversationInMessage` | {`method`, `from`, `to`} | {`from`, `leaveTime`} | `JFMSClientConversationInMessage` is sending to engine by user come into conversation. Engine get leave time of user `to` from `last_seen_hash` map and send back `JFMSServerConversationMessage`. |
+| `JFMSClientSeenMessage` | {`method`, `from`, `to`, [`messageIdList`], `seenTime`} | --- | `JFMSClientSeenMessage` is sending to engine, `JFMSServerSeenMessage` generated from it and send to `to` field. | 
 
 * Note: `groupSendMessage`, `groupEditMessage`, `groupDeleteMessage`, `groupIsTypingMessage`, `groupLeaveMessage` are just like above p2p messages but by other `method` field values. 
