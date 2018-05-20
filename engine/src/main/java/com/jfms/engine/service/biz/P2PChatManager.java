@@ -28,7 +28,7 @@ import java.util.*;
  * Created by vahid on 4/3/18.
  */
 @Component
-public class ChatManager implements InitializingBean {
+public class P2PChatManager implements InitializingBean {
 
     @Autowired
     OnlineMessageRepository onlineMessageRepository;
@@ -46,12 +46,7 @@ public class ChatManager implements InitializingBean {
     OfflineMessageApiClient offlineMessageApiClient;
     @Autowired
     MessageHistoryApiFactory messageHistoryApiFactory;
-    @Autowired
-    GroupApiClient groupApiClient;
-    @Autowired
-    GroupRepository groupRepository;
-    @Autowired
-    GroupConverter groupConverter;
+
     Gson gson = new Gson();
 
     @Override
@@ -193,156 +188,10 @@ public class ChatManager implements InitializingBean {
 //        presenceRepository.setPresenceStatus(jfmsClientLoginMessage.getUserName(), UserStatus.ONLINE.getValue());
 
     }
-    //--------------- group messaging
-
-    public void createGroup(JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage, WebSocketSession session) {
-        GroupInfo groupInfo = GroupApiClient.getGroupInfo(
-            jfmsClientGroupCreationMessage.getDisplayName(),
-                jfmsClientGroupCreationMessage.getCreator(),
-                jfmsClientGroupCreationMessage.getJfmsGroupMemberMap(),
-                jfmsClientGroupCreationMessage.getType()
-        );
-        String groupId = groupApiClient.addGroup(groupInfo);
-        GroupInfoEntity groupInfoEntity = groupConverter.getEntityFromJFMSMessage(jfmsClientGroupCreationMessage);
-        groupRepository.saveGroupInfo(groupId, groupInfoEntity);
-        sendGroupCreationOrInfoUpdateMessageToMembers(
-                jfmsMessageConverter.clientGroupCreationToServerGroupCreation(groupId, jfmsClientGroupCreationMessage)
-        );
-
-        //todo group message History
-        try {
-            session.sendMessage(new TextMessage("{\"goupId\":\"" + groupId+ "\"}"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            //todo log
-        }
-    }
-
-    public void editGroupInfo(JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage){
-        GroupInfo groupInfo = GroupApiClient.getGroupInfo(
-                jfmsClientGroupInfoEditMessage.getId(),
-                jfmsClientGroupInfoEditMessage.getDisplayName(),
-                jfmsClientGroupInfoEditMessage.getCreator(),
-                jfmsClientGroupInfoEditMessage.getJfmsGroupMemberMap(),
-                jfmsClientGroupInfoEditMessage.getType()
-        );
-        groupApiClient.editGroup(groupInfo);
-        GroupInfoEntity groupInfoEntity = groupConverter.getEntityFromJFMSMessage(jfmsClientGroupInfoEditMessage);
-        groupRepository.saveGroupInfo(groupInfo.getId(), groupInfoEntity);
-        sendGroupCreationOrInfoUpdateMessageToMembers(
-                jfmsMessageConverter.clientGroupInfoEditToServerGroupCreation(jfmsClientGroupInfoEditMessage)
-        );
-    }
-
-
-    public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
-        String messageId = UUID.randomUUID().toString();
-        JFMSServerGroupSendMessage jfmsServerGroupSendMessage =
-                jfmsMessageConverter.clientSendToServerGroupSend(messageId, jfmsClientGroupSendMessage);
-        sendGroupOnlineOrOffline(
-                jfmsClientGroupSendMessage.getFrom(),
-                jfmsClientGroupSendMessage.getTo(),
-                gson.toJson(jfmsServerGroupSendMessage)
-        );
-
-        try {
-            session.sendMessage(new TextMessage("{\"id\":\"" + messageId+ "\"}"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            //todo log
-        }
-        HistoryMessage groupHistoryMessage = MessageHistoryGroupApiClient.getGroupHistoryMessage(
-                messageId,
-                jfmsClientGroupSendMessage.getFrom(),
-                jfmsClientGroupSendMessage.getBody(),
-                jfmsClientGroupSendMessage.getSubject(),
-                jfmsClientGroupSendMessage.getSendTime()
-        );
-        messageHistoryApiFactory.getGroupApi().saveGroupHistoryMessage(jfmsClientGroupSendMessage.getTo(), groupHistoryMessage);
-    }
-
-    public void editGroupMessage(JFMSClientEditMessage jfmsClientGroupEditMessage){
-        JFMSServerGroupEditMessage jfmsServerGroupEditMessage=
-                jfmsMessageConverter.clientEditToServerGroupEdit(jfmsClientGroupEditMessage);
-        sendGroupOnlineOrOffline(
-                jfmsClientGroupEditMessage.getFrom(),
-                jfmsClientGroupEditMessage.getTo(),
-                gson.toJson(jfmsServerGroupEditMessage)
-        );
-        HistoryMessage groupHistoryMessage = MessageHistoryGroupApiClient.getGroupHistoryMessage(
-                jfmsClientGroupEditMessage.getId(),
-                jfmsClientGroupEditMessage.getFrom(),
-                jfmsClientGroupEditMessage.getBody(),
-                jfmsClientGroupEditMessage.getSubject(),
-                jfmsClientGroupEditMessage.getEditTime()
-        );
-        messageHistoryApiFactory.getGroupApi().updateGroupHistoryMessage(jfmsClientGroupEditMessage.getTo(), groupHistoryMessage);
-    }
-
-    public void deleteGroupMessage(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage){
-        JFMSServerGroupDeleteMessage jfmsServerGroupDeleteMessage=
-                jfmsMessageConverter.clientDeleteToServerGroupDelete(jfmsClientGroupDeleteMessage);
-        sendGroupOnlineOrOffline(
-                jfmsClientGroupDeleteMessage.getFrom(),
-                jfmsClientGroupDeleteMessage.getTo(),
-                gson.toJson(jfmsServerGroupDeleteMessage)
-        );
-        messageHistoryApiFactory.getGroupApi().deleteGroupMessage(
-                jfmsClientGroupDeleteMessage.getTo(),
-                jfmsClientGroupDeleteMessage.getIdList()
-        );
-    }
-
-    public void groupIsTypingMessage(JFMSClientIsTypingMessage jfmsClientGroupIsTypingMessage) {
-        JFMSServerGroupIsTypingMessage jfmsServerGroupIsTypingMessage =
-                jfmsMessageConverter.clientIsTypingToServerGroupIsTyping(jfmsClientGroupIsTypingMessage);
-        sendGroupOnline(
-                jfmsClientGroupIsTypingMessage.getFrom(),
-                jfmsClientGroupIsTypingMessage.getTo(),
-                gson.toJson(jfmsServerGroupIsTypingMessage)
-        );
-    }
-
-
-    public void setGroupLeaveTime(JFMSClientConversationLeaveMessage jfmsClientGroupConversationLeaveMessage) {
-        lastSeenRepository.setLastSeen(
-                jfmsClientGroupConversationLeaveMessage.getFrom(),
-                jfmsClientGroupConversationLeaveMessage.getTo(),
-                jfmsClientGroupConversationLeaveMessage.getLeaveTime()
-        );
-        JFMSServerGroupConversationMessage jfmsServerGroupConversationMessage =
-                jfmsMessageConverter.clientConversationLeaveToServerGroupConversation(jfmsClientGroupConversationLeaveMessage);
-        sendGroupOnlineOrOffline(
-                jfmsClientGroupConversationLeaveMessage.getFrom(),
-                jfmsClientGroupConversationLeaveMessage.getTo(),
-                gson.toJson(jfmsServerGroupConversationMessage)
-        );
-
-    }
 
     //---------------------------------
-    private void sendGroupCreationOrInfoUpdateMessageToMembers(JFMSServerGroupCreationMessage jfmsServerGroupCreationMessage) {
-        Iterator<Map.Entry<String, Boolean>> memberIterator = jfmsServerGroupCreationMessage.getJfmsGroupMemberMap().entrySet().iterator();
-        while (memberIterator.hasNext()){
-            Map.Entry<String, Boolean> member = memberIterator.next();
-            sendOnlineOrOffline(member.getKey(), gson.toJson(jfmsServerGroupCreationMessage));
 
-        }
-    }
-
-    private void sendGroupOnlineOrOffline(String from, String groupId, String message) {
-        GroupInfoEntity groupInfoEntity = groupRepository.getGroupInfo(groupId);
-        if (!groupInfoEntity.getJfmsGroupMemberMap().containsKey(from))
-            return;
-        Iterator<Map.Entry<String, Boolean>> groupIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
-        while (groupIterator.hasNext()){
-            Map.Entry<String, Boolean> next = groupIterator.next();
-            if (!next.getKey().equals(from))
-                sendOnlineOrOffline(next.getKey(), message);
-        }
-    }
-
-    private void sendOnlineOrOffline(String user, String message) {
+    public void sendOnlineOrOffline(String user, String message) {
         String memberPresenceStatus = presenceRepository.getPresenceStatus(user);
         if (memberPresenceStatus == null || memberPresenceStatus.equals("offline")){
             OfflineMessage offlineMessage =
@@ -353,19 +202,7 @@ public class ChatManager implements InitializingBean {
         }
     }
 
-    private void sendGroupOnline(String from, String groupId, String message) {
-        GroupInfoEntity groupInfoEntity = groupRepository.getGroupInfo(groupId);
-        if (!groupInfoEntity.contains(from))
-            return;
-        Iterator<Map.Entry<String, Boolean>> gIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
-        while (gIterator.hasNext()){
-            Map.Entry<String, Boolean> next = gIterator.next();
-            if (!next.getKey().equals(from))
-                sendOnline(next.getKey(), message);
-        }
-    }
-
-    private void sendOnline(String user, String message){
+    public void sendOnline(String user, String message){
         String memberPresenceStatus = presenceRepository.getPresenceStatus(user);
         if (memberPresenceStatus != null && memberPresenceStatus.equals("online")){
             onlineMessageRepository.sendMessage(user, message);
@@ -373,16 +210,16 @@ public class ChatManager implements InitializingBean {
     }
 
 
-    public String getChannelName(String from, String to){
-        if (from.compareTo(to) >= 0)
-            return from + to;
-        else
-            return to + from;
-
-    }
-
-    public void initFallback(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
-        //todo handle business & log exception
-        System.out.println("_______ init failed ________");
-    }
+//    public String getChannelName(String from, String to){
+//        if (from.compareTo(to) >= 0)
+//            return from + to;
+//        else
+//            return to + from;
+//
+//    }
+//
+//    public void initFallback(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
+//        //todo handle business & log exception
+//        System.out.println("_______ init failed ________");
+//    }
 }
