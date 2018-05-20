@@ -1,5 +1,5 @@
-# jfms
-java fast messaging service
+# Java Fast Messaging Service (JFMS)
+Currently opensource chat engines have major problems. Some of them like matrix uses long polling that consumes almost most battery usage and also after gathering chat info on server side  some of problems has occured because of usage of relational data base. Some others like openfire uses xmpp protocol that causes most network traffic. Since I start JFMS project that uses microservice design with an orchastrator helps us easy distribution. Also I used cassandra nosql database for gathering message history and mongodb nosql database for saving other infoes that both of them can be sharded and distributed easyly. On the other hand I use RedisChannel concept for very fastly online message exchanging and messages brocker (until now kafka) for saving offline messages saving.   
 
 ## AAA microservice
 port number is `6070`.
