@@ -1,6 +1,7 @@
 package com.jfms.message_history.converter;
 
 import com.jfms.message_history.dal.EntityStatus;
+import com.jfms.message_history.dal.entity.ChannelEntity;
 import com.jfms.message_history.dal.entity.GroupEntity;
 import com.jfms.message_history.dal.entity.P2PEntity;
 import com.jfms.message_history.model.HistoryMessage;
@@ -72,11 +73,30 @@ public class MessageConverter {
         groupEntity.setStatus(EntityStatus.INSERTED.getValue());
         return groupEntity;
     }
+    public ChannelEntity historyMessageToChannelEntity(String channelId, HistoryMessage messageForHistory) {
+        if (messageForHistory == null)
+            return null;
+        ChannelEntity channelEntity = new ChannelEntity();
+        channelEntity.setChannelId(channelId);
+        channelEntity.setBody(messageForHistory.getBody());
+        channelEntity.setSender(messageForHistory.getSender());
+        channelEntity.setMessageId(messageForHistory.getMessageId());
+        channelEntity.setSubject(messageForHistory.getSubject());
+        channelEntity.setTime(messageForHistory.getTime());
+        channelEntity.setStatus(EntityStatus.INSERTED.getValue());
+        return channelEntity;
+    }
 
     public void historyMessageToUpdatedGroupEntity(HistoryMessage messageForUpdate, GroupEntity previousGroupEntity) {
         previousGroupEntity.setBody(messageForUpdate.getBody());
         previousGroupEntity.setSubject(messageForUpdate.getSubject());
         previousGroupEntity.setStatus(EntityStatus.UPDATED.getValue());
+    }
+
+    public void historyMessageToUpdatedChannelEntity(HistoryMessage messageForUpdate, ChannelEntity previousChannelEntity) {
+        previousChannelEntity.setBody(messageForUpdate.getBody());
+        previousChannelEntity.setSubject(messageForUpdate.getSubject());
+        previousChannelEntity.setStatus(EntityStatus.UPDATED.getValue());
     }
 
     public List<HistoryMessage> groupEntityListToHistoryMessageList(List<GroupEntity> groupEntityList) {
@@ -85,6 +105,17 @@ public class MessageConverter {
         List<HistoryMessage> historyMessageList = new ArrayList<HistoryMessage>();
         for (GroupEntity groupEntity : groupEntityList) {
             historyMessageList.add(groupEntityToHistoyMessage(groupEntity));
+        }
+        return historyMessageList;
+    }
+
+
+    public List<HistoryMessage> channelEntityListToHistoryMessageList(List<ChannelEntity> channelEntityList) {
+        if (channelEntityList == null)
+            return null;
+        List<HistoryMessage> historyMessageList = new ArrayList<HistoryMessage>();
+        for (ChannelEntity channelEntity : channelEntityList) {
+            historyMessageList.add(channelEntityToHistoyMessage(channelEntity));
         }
         return historyMessageList;
     }
@@ -98,4 +129,16 @@ public class MessageConverter {
                 groupEntity.getTime()
         );
     }
+
+    private HistoryMessage channelEntityToHistoyMessage(ChannelEntity channelEntity) {
+        return new HistoryMessage(
+                channelEntity.getMessageId(),
+                channelEntity.getSender(),
+                channelEntity.getBody(),
+                channelEntity.getSubject(),
+                channelEntity.getTime()
+        );
+    }
+
+
 }

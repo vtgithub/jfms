@@ -1,5 +1,6 @@
 package com.jfms.engine.service.biz.remote.api;
 
+import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryChannelApiClient;
 import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryGroupApiClient;
 import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryP2PApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ public class MessageHistoryApiFactory {
     private MessageHistoryP2PApiClient messageHistoryP2PApiClient;
     @Autowired
     private MessageHistoryGroupApiClient messageHistoryGroupApiClient;
+    @Autowired
+    private MessageHistoryChannelApiClient messageHistoryChannelApiClient;
 
     public MessageHistoryP2PApiClient getP2PApi(){
         return this.messageHistoryP2PApiClient;
@@ -18,5 +21,9 @@ public class MessageHistoryApiFactory {
 
     public MessageHistoryGroupApiClient getGroupApi() {
         return this.messageHistoryGroupApiClient;
+    }
+
+    public MessageHistoryChannelApiClient getChannelApi() {
+        return messageHistoryChannelApiClient;
     }
 }

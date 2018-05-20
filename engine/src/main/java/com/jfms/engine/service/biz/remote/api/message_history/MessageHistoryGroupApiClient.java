@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 // url = "localhost:7080"
 //serviceId = "message-history-server"
-@FeignClient(name = "message-history-api",
+@FeignClient(name = "message-history-group-api",
         serviceId = "message-history-server",
         fallbackFactory = MessageHistoryGroupApiClientFallback.class
 )

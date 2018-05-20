@@ -2,3 +2,4 @@ com/jfms/message_history/model/HistoryMessageRequest.class
 com/jfms/message_history/GroupHistoryApi.class
 com/jfms/message_history/model/HistoryMessage.class
 com/jfms/message_history/P2PHistoryApi.class
+com/jfms/message_history/ChannelHistoryApi.class

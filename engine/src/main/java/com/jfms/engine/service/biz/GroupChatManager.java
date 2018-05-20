@@ -18,6 +18,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,7 +34,11 @@ public class GroupChatManager implements InitializingBean{
     @Autowired
     GroupApiClient groupApiClient;
     @Autowired
+    ChannelApiClient channelApiClient;
+    @Autowired
     GroupRepository groupRepository;
+    @Autowired
+    ChannelRepository channelRepository;
     @Autowired
     GroupConverter groupConverter;
     @Autowired
@@ -56,30 +61,37 @@ public class GroupChatManager implements InitializingBean{
         onlineMessageRepository.setMessageListener(onlineMessageListener);
     }
 
-    public void createGroup(JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage, WebSocketSession session) {
+    public void createGroup(
+            JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage, WebSocketSession session, boolean isChannel){
         GroupInfo groupInfo = GroupApiClient.getGroupInfo(
                 jfmsClientGroupCreationMessage.getDisplayName(),
                 jfmsClientGroupCreationMessage.getCreator(),
                 jfmsClientGroupCreationMessage.getJfmsGroupMemberMap(),
                 jfmsClientGroupCreationMessage.getType()
         );
-        String groupId = groupApiClient.addGroup(groupInfo);
+        String id = null;
         GroupInfoEntity groupInfoEntity = groupConverter.getEntityFromJFMSMessage(jfmsClientGroupCreationMessage);
-        groupRepository.saveGroupInfo(groupId, groupInfoEntity);
-        sendGroupCreationOrInfoUpdateMessageToMembers(
-                jfmsMessageConverter.clientGroupCreationToServerGroupCreation(groupId, jfmsClientGroupCreationMessage)
+        if (isChannel == true) {
+            id = channelApiClient.addChannel(groupInfo);
+            channelRepository.saveChannelInfo(id, groupInfoEntity);
+        } else {
+            id = groupApiClient.addGroup(groupInfo);
+            groupRepository.saveGroupInfo(id, groupInfoEntity);
+        }
+        sendGroupOrChannelCreationOrInfoUpdateMessageToMembers(
+                jfmsMessageConverter.clientGroupCreationToServerGroupCreation(id, jfmsClientGroupCreationMessage)
         );
-
         //todo group message History
         try {
-            session.sendMessage(new TextMessage("{\"goupId\":\"" + groupId+ "\"}"));
+            String message = (isChannel == true) ? "{\"groupId\":\"" + id + "\"}" : "{\"channelId\":\"" + id + "\"}";
+            session.sendMessage(new TextMessage(message));
         } catch (IOException e) {
             e.printStackTrace();
             //todo log
         }
     }
 
-    public void editGroupInfo(JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage){
+    public void editGroupInfo(JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage, boolean isChannel){
         GroupInfo groupInfo = GroupApiClient.getGroupInfo(
                 jfmsClientGroupInfoEditMessage.getId(),
                 jfmsClientGroupInfoEditMessage.getDisplayName(),
@@ -87,23 +99,32 @@ public class GroupChatManager implements InitializingBean{
                 jfmsClientGroupInfoEditMessage.getJfmsGroupMemberMap(),
                 jfmsClientGroupInfoEditMessage.getType()
         );
-        groupApiClient.editGroup(groupInfo);
         GroupInfoEntity groupInfoEntity = groupConverter.getEntityFromJFMSMessage(jfmsClientGroupInfoEditMessage);
-        groupRepository.saveGroupInfo(groupInfo.getId(), groupInfoEntity);
-        sendGroupCreationOrInfoUpdateMessageToMembers(
-                jfmsMessageConverter.clientGroupInfoEditToServerGroupCreation(jfmsClientGroupInfoEditMessage)
-        );
+
+        if(isChannel == true){
+            channelApiClient.editChannel(groupInfo);
+            channelRepository.saveChannelInfo(groupInfo.getId(), groupInfoEntity);
+        }else{
+            groupApiClient.editGroup(groupInfo);
+            groupRepository.saveGroupInfo(groupInfo.getId(), groupInfoEntity);
+        }
+
+        sendGroupOrChannelCreationOrInfoUpdateMessageToMembers(
+                jfmsMessageConverter.clientGroupInfoEditToServerGroupCreation(jfmsClientGroupInfoEditMessage));
+        //todo group message History
     }
 
 
-    public void sendGroupMessage(JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session) {
+    public void sendGroupMessage(
+            JFMSClientSendMessage jfmsClientGroupSendMessage, WebSocketSession session, boolean isChannel) {
         String messageId = UUID.randomUUID().toString();
         JFMSServerGroupSendMessage jfmsServerGroupSendMessage =
                 jfmsMessageConverter.clientSendToServerGroupSend(messageId, jfmsClientGroupSendMessage);
-        sendGroupOnlineOrOffline(
+        sendGroupOrChannelOnlineOrOffline(
                 jfmsClientGroupSendMessage.getFrom(),
                 jfmsClientGroupSendMessage.getTo(),
-                gson.toJson(jfmsServerGroupSendMessage)
+                gson.toJson(jfmsServerGroupSendMessage),
+                isChannel
         );
 
         try {
@@ -119,16 +140,18 @@ public class GroupChatManager implements InitializingBean{
                 jfmsClientGroupSendMessage.getSubject(),
                 jfmsClientGroupSendMessage.getSendTime()
         );
-        messageHistoryApiFactory.getGroupApi().saveGroupHistoryMessage(jfmsClientGroupSendMessage.getTo(), groupHistoryMessage);
+        historySaveGroupOrChannel(jfmsClientGroupSendMessage.getTo(), groupHistoryMessage, isChannel);
     }
 
-    public void editGroupMessage(JFMSClientEditMessage jfmsClientGroupEditMessage){
+
+    public void editGroupMessage(JFMSClientEditMessage jfmsClientGroupEditMessage, boolean isChannel){
         JFMSServerGroupEditMessage jfmsServerGroupEditMessage=
                 jfmsMessageConverter.clientEditToServerGroupEdit(jfmsClientGroupEditMessage);
-        sendGroupOnlineOrOffline(
+        sendGroupOrChannelOnlineOrOffline(
                 jfmsClientGroupEditMessage.getFrom(),
                 jfmsClientGroupEditMessage.getTo(),
-                gson.toJson(jfmsServerGroupEditMessage)
+                gson.toJson(jfmsServerGroupEditMessage),
+                isChannel
         );
         HistoryMessage groupHistoryMessage = MessageHistoryGroupApiClient.getGroupHistoryMessage(
                 jfmsClientGroupEditMessage.getId(),
@@ -137,34 +160,36 @@ public class GroupChatManager implements InitializingBean{
                 jfmsClientGroupEditMessage.getSubject(),
                 jfmsClientGroupEditMessage.getEditTime()
         );
-        messageHistoryApiFactory.getGroupApi().updateGroupHistoryMessage(jfmsClientGroupEditMessage.getTo(), groupHistoryMessage);
+        historyEditGroupOrChannel(jfmsClientGroupEditMessage.getTo(), groupHistoryMessage, isChannel);
     }
 
-    public void deleteGroupMessage(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage){
+
+    public void deleteGroupMessage(JFMSClientDeleteMessage jfmsClientGroupDeleteMessage, boolean isChannel){
         JFMSServerGroupDeleteMessage jfmsServerGroupDeleteMessage=
                 jfmsMessageConverter.clientDeleteToServerGroupDelete(jfmsClientGroupDeleteMessage);
-        sendGroupOnlineOrOffline(
+        sendGroupOrChannelOnlineOrOffline(
                 jfmsClientGroupDeleteMessage.getFrom(),
                 jfmsClientGroupDeleteMessage.getTo(),
-                gson.toJson(jfmsServerGroupDeleteMessage)
+                gson.toJson(jfmsServerGroupDeleteMessage),
+                isChannel
         );
-        messageHistoryApiFactory.getGroupApi().deleteGroupMessage(
-                jfmsClientGroupDeleteMessage.getTo(),
-                jfmsClientGroupDeleteMessage.getIdList()
-        );
+        historyDeleteGroupOrChannel(jfmsClientGroupDeleteMessage.getTo(), jfmsClientGroupDeleteMessage.getIdList(), isChannel);
+
     }
 
-    public void groupIsTypingMessage(JFMSClientIsTypingMessage jfmsClientGroupIsTypingMessage) {
+    public void groupIsTypingMessage(JFMSClientIsTypingMessage jfmsClientGroupIsTypingMessage, boolean isChannel) {
         JFMSServerGroupIsTypingMessage jfmsServerGroupIsTypingMessage =
                 jfmsMessageConverter.clientIsTypingToServerGroupIsTyping(jfmsClientGroupIsTypingMessage);
         sendGroupOnline(
                 jfmsClientGroupIsTypingMessage.getFrom(),
                 jfmsClientGroupIsTypingMessage.getTo(),
-                gson.toJson(jfmsServerGroupIsTypingMessage)
+                gson.toJson(jfmsServerGroupIsTypingMessage),
+                isChannel
         );
     }
 
-    public void setGroupLeaveTime(JFMSClientConversationLeaveMessage jfmsClientGroupConversationLeaveMessage) {
+    public void setGroupLeaveTime(
+            JFMSClientConversationLeaveMessage jfmsClientGroupConversationLeaveMessage, boolean isChannel) {
         lastSeenRepository.setLastSeen(
                 jfmsClientGroupConversationLeaveMessage.getFrom(),
                 jfmsClientGroupConversationLeaveMessage.getTo(),
@@ -172,17 +197,19 @@ public class GroupChatManager implements InitializingBean{
         );
         JFMSServerGroupConversationMessage jfmsServerGroupConversationMessage =
                 jfmsMessageConverter.clientConversationLeaveToServerGroupConversation(jfmsClientGroupConversationLeaveMessage);
-        sendGroupOnlineOrOffline(
+        sendGroupOrChannelOnlineOrOffline(
                 jfmsClientGroupConversationLeaveMessage.getFrom(),
                 jfmsClientGroupConversationLeaveMessage.getTo(),
-                gson.toJson(jfmsServerGroupConversationMessage)
+                gson.toJson(jfmsServerGroupConversationMessage),
+                isChannel
         );
 
     }
 
     //-----------------------------
 
-    private void sendGroupCreationOrInfoUpdateMessageToMembers(JFMSServerGroupCreationMessage jfmsServerGroupCreationMessage) {
+    private void sendGroupOrChannelCreationOrInfoUpdateMessageToMembers(
+            JFMSServerGroupCreationMessage jfmsServerGroupCreationMessage) {
         Iterator<Map.Entry<String, Boolean>> memberIterator = jfmsServerGroupCreationMessage.getJfmsGroupMemberMap().entrySet().iterator();
         while (memberIterator.hasNext()){
             Map.Entry<String, Boolean> member = memberIterator.next();
@@ -191,9 +218,11 @@ public class GroupChatManager implements InitializingBean{
         }
     }
 
-    private void sendGroupOnline(String from, String groupId, String message) {
-        GroupInfoEntity groupInfoEntity = groupRepository.getGroupInfo(groupId);
-        if (!groupInfoEntity.contains(from))
+    private void sendGroupOnline(String from, String groupId, String message, boolean isChannel) {
+        GroupInfoEntity groupInfoEntity = (isChannel)?channelRepository.getChannelInfo(groupId):groupRepository.getGroupInfo(groupId);
+        if (!isChannel && !groupInfoEntity.contains(from))
+            return;
+        if (isChannel && !groupInfoEntity.containsAsAdmin(from))
             return;
         Iterator<Map.Entry<String, Boolean>> gIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
         while (gIterator.hasNext()){
@@ -203,9 +232,11 @@ public class GroupChatManager implements InitializingBean{
         }
     }
 
-    private void sendGroupOnlineOrOffline(String from, String groupId, String message) {
-        GroupInfoEntity groupInfoEntity = groupRepository.getGroupInfo(groupId);
-        if (!groupInfoEntity.getJfmsGroupMemberMap().containsKey(from))
+    private void sendGroupOrChannelOnlineOrOffline(String from, String groupId, String message, boolean isChannel) {
+        GroupInfoEntity groupInfoEntity = (isChannel)?channelRepository.getChannelInfo(groupId):groupRepository.getGroupInfo(groupId);
+        if (!isChannel && !groupInfoEntity.getJfmsGroupMemberMap().containsKey(from))
+            return;
+        if (isChannel && !groupInfoEntity.containsAsAdmin(from))
             return;
         Iterator<Map.Entry<String, Boolean>> groupIterator = groupInfoEntity.getJfmsGroupMemberMap().entrySet().iterator();
         while (groupIterator.hasNext()){
@@ -213,6 +244,29 @@ public class GroupChatManager implements InitializingBean{
             if (!next.getKey().equals(from))
                 p2PChatManager.sendOnlineOrOffline(next.getKey(), message);
         }
+    }
+
+    //--------------- select for history
+    private void historySaveGroupOrChannel(String owner, HistoryMessage groupHistoryMessage, boolean isChannel) {
+        if (isChannel == true){
+            messageHistoryApiFactory.getChannelApi().saveChannelHistoryMessage(owner, groupHistoryMessage);
+        }else {
+            messageHistoryApiFactory.getGroupApi().saveGroupHistoryMessage(owner, groupHistoryMessage);
+        }
+    }
+
+    private void historyEditGroupOrChannel(String owner, HistoryMessage groupHistoryMessage, boolean isChannel) {
+        if (isChannel == true)
+            messageHistoryApiFactory.getChannelApi().updateChannelHistoryMessage(owner, groupHistoryMessage);
+        else
+            messageHistoryApiFactory.getGroupApi().updateGroupHistoryMessage(owner, groupHistoryMessage);
+    }
+
+    private void historyDeleteGroupOrChannel(String owner, List<String> messageIdList, boolean isChannel) {
+        if (isChannel == true)
+            messageHistoryApiFactory.getChannelApi().deleteChannelMessage(owner, messageIdList);
+        else
+            messageHistoryApiFactory.getGroupApi().deleteGroupMessage(owner, messageIdList);
     }
 
 }

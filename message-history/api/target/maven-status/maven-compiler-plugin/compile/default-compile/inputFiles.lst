@@ -2,3 +2,4 @@
 /home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/GroupHistoryApi.java
 /home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/model/HistoryMessage.java
 /home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/model/HistoryMessageRequest.java
+/home/vahid/my-repoes/jfms/message-history/api/src/main/java/com/jfms/message_history/ChannelHistoryApi.java

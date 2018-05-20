@@ -1,18 +1,13 @@
 package com.jfms.engine.service.biz;
 
 import com.google.gson  .Gson;
-import com.jfms.aaa.model.GroupInfo;
 import com.jfms.engine.api.Method;
 import com.jfms.engine.api.converter.JFMSMessageConverter;
 import com.jfms.engine.api.model.*;
 import com.jfms.engine.dal.UserSessionRepository;
-import com.jfms.engine.service.biz.remote.FallbackHandler;
-import com.jfms.engine.service.biz.remote.GroupConverter;
 import com.jfms.engine.service.biz.remote.OnlineMessageListener;
 import com.jfms.engine.service.biz.remote.api.*;
-import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryGroupApiClient;
 import com.jfms.engine.service.biz.remote.api.message_history.MessageHistoryP2PApiClient;
-import com.jfms.engine.service.biz.remote.model.GroupInfoEntity;
 import com.jfms.message_history.model.HistoryMessage;
 import com.jfms.offline_message.model.OfflineMessage;
 import org.springframework.beans.factory.InitializingBean;
@@ -58,6 +53,7 @@ public class P2PChatManager implements InitializingBean {
     }
 
     public void init(JFMSClientLoginMessage jfmsClientLoginMessage, WebSocketSession session) {
+        //todo get last seen of rosters
         userSessionRepository.addSession(jfmsClientLoginMessage.getUserName(), session);
         presenceRepository.setPresenceStatus(jfmsClientLoginMessage.getUserName(), UserStatus.ONLINE.getValue());
 //        List<String> offlineMessageList =

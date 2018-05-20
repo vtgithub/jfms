@@ -60,31 +60,59 @@ public class ChatManagerService {
         } else if (methodNo == Method.GROUP_CREATION.getValue()){
             JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage =
                     gson.fromJson(messageInJson, JFMSClientGroupCreationMessage.class);
-            groupChatManager.createGroup(jfmsClientGroupCreationMessage, session);
-        } else if (methodNo == Method.GROUP_SEND.getValue()){
-            JFMSClientSendMessage jfmsClientGroupSendMessage =
-                    gson.fromJson(messageInJson, JFMSClientSendMessage.class);
-            groupChatManager.sendGroupMessage(jfmsClientGroupSendMessage, session);
-        } else if (methodNo == Method.GROUP_EDIT.getValue()){
-            JFMSClientEditMessage jfmsClientGroupEditMessage =
-                    gson.fromJson(messageInJson, JFMSClientEditMessage.class);
-            groupChatManager.editGroupMessage(jfmsClientGroupEditMessage);
-        } else if (methodNo == Method.GROUP_DELETE.getValue()){
-            JFMSClientDeleteMessage jfmsClientGroupDeleteMessage=
-                    gson.fromJson(messageInJson, JFMSClientDeleteMessage.class);
-            groupChatManager.deleteGroupMessage(jfmsClientGroupDeleteMessage);
-        } else if (methodNo == Method.GROUP_IS_TYPING.getValue()){
-            JFMSClientIsTypingMessage jfmsClientIsTypingMessage =
-                    gson.fromJson(messageInJson, JFMSClientIsTypingMessage.class);
-            groupChatManager.groupIsTypingMessage(jfmsClientIsTypingMessage);
-        } else if (methodNo == Method.GROUP_CONVERSATION_LEAVE.getValue()){
-            JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage =
-                    gson.fromJson(messageInJson, JFMSClientConversationLeaveMessage.class);
-            groupChatManager.setGroupLeaveTime(jfmsClientConversationLeaveMessage);
+            groupChatManager.createGroup(jfmsClientGroupCreationMessage, session, false);
         } else if (methodNo == Method.GROUP_INFO_EDIT.getValue()){
             JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage =
                     gson.fromJson(messageInJson, JFMSClientGroupInfoEditMessage.class);
-            groupChatManager.editGroupInfo(jfmsClientGroupInfoEditMessage);
+            groupChatManager.editGroupInfo(jfmsClientGroupInfoEditMessage, false);
+        } else if (methodNo == Method.GROUP_SEND.getValue()){
+            JFMSClientSendMessage jfmsClientGroupSendMessage =
+                    gson.fromJson(messageInJson, JFMSClientSendMessage.class);
+            groupChatManager.sendGroupMessage(jfmsClientGroupSendMessage, session, false);
+        } else if (methodNo == Method.GROUP_EDIT.getValue()){
+            JFMSClientEditMessage jfmsClientGroupEditMessage =
+                    gson.fromJson(messageInJson, JFMSClientEditMessage.class);
+            groupChatManager.editGroupMessage(jfmsClientGroupEditMessage, false);
+        } else if (methodNo == Method.GROUP_DELETE.getValue()){
+            JFMSClientDeleteMessage jfmsClientGroupDeleteMessage=
+                    gson.fromJson(messageInJson, JFMSClientDeleteMessage.class);
+            groupChatManager.deleteGroupMessage(jfmsClientGroupDeleteMessage, false);
+        } else if (methodNo == Method.GROUP_IS_TYPING.getValue()){
+            JFMSClientIsTypingMessage jfmsClientIsTypingMessage =
+                    gson.fromJson(messageInJson, JFMSClientIsTypingMessage.class);
+            groupChatManager.groupIsTypingMessage(jfmsClientIsTypingMessage, false);
+        } else if (methodNo == Method.GROUP_CONVERSATION_LEAVE.getValue()){
+            JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage =
+                    gson.fromJson(messageInJson, JFMSClientConversationLeaveMessage.class);
+            groupChatManager.setGroupLeaveTime(jfmsClientConversationLeaveMessage, false);
+        } else if (methodNo == Method.CHANNEL_CREATION.getValue()){
+            JFMSClientGroupCreationMessage jfmsClientGroupCreationMessage =
+                    gson.fromJson(messageInJson, JFMSClientGroupCreationMessage.class);
+            groupChatManager.createGroup(jfmsClientGroupCreationMessage, session, true);
+        } else if (methodNo == Method.CHANNEL_INFO_EDIT.getValue()){
+            JFMSClientGroupInfoEditMessage jfmsClientGroupInfoEditMessage =
+                    gson.fromJson(messageInJson, JFMSClientGroupInfoEditMessage.class);
+            groupChatManager.editGroupInfo(jfmsClientGroupInfoEditMessage, true);
+        } else if (methodNo == Method.CHANNEL_SEND.getValue()){
+            JFMSClientSendMessage jfmsClientGroupSendMessage =
+                    gson.fromJson(messageInJson, JFMSClientSendMessage.class);
+            groupChatManager.sendGroupMessage(jfmsClientGroupSendMessage, session, true);
+        } else if (methodNo == Method.CHANNEL_EDIT.getValue()){
+            JFMSClientEditMessage jfmsClientGroupEditMessage =
+                    gson.fromJson(messageInJson, JFMSClientEditMessage.class);
+            groupChatManager.editGroupMessage(jfmsClientGroupEditMessage, true);
+        } else if (methodNo == Method.CHANNEL_DELETE.getValue()){
+            JFMSClientDeleteMessage jfmsClientGroupDeleteMessage=
+                    gson.fromJson(messageInJson, JFMSClientDeleteMessage.class);
+            groupChatManager.deleteGroupMessage(jfmsClientGroupDeleteMessage, true);
+        } else if (methodNo == Method.CHANNEL_IS_TYPING.getValue()){
+            JFMSClientIsTypingMessage jfmsClientIsTypingMessage =
+                    gson.fromJson(messageInJson, JFMSClientIsTypingMessage.class);
+            groupChatManager.groupIsTypingMessage(jfmsClientIsTypingMessage, true);
+        } else if (methodNo == Method.CHANNEL_CONVERSATION_LEAVE.getValue()){
+            JFMSClientConversationLeaveMessage jfmsClientConversationLeaveMessage =
+                    gson.fromJson(messageInJson, JFMSClientConversationLeaveMessage.class);
+            groupChatManager.setGroupLeaveTime(jfmsClientConversationLeaveMessage, true);
         }
     }
 
