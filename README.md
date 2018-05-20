@@ -14,6 +14,7 @@ port number is `6070`.
 | `PUT` | `aaa/group` | {`id`, `displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | --- | --- | update group info. |
 | `GET` | `aaa/group/{gId}` | --- | --- |  {`displayName`, `owner`, `memberList`:[{`userName`,`admin`}, ...]} | returns `groupInfo` belongs to the `gId`. |
 | `DELETE` | `aaa/group/{gId}` | --- | --- |  --- | chage status of group info to deleted|
+* Note: For channel just same group services but replace `group` word by `channel` word.
 
 ## offline-message
 port number is `7070`.
@@ -36,6 +37,8 @@ port number is `7080`.
 | `PUT` | `history/group/{groupId}` | {`messageId`, `sender`, `body`, `subject`, `time`} | --- | --- | change status of seved message to updated and insert a field into `GroupUpdateEntity`. |
 | `GET` | `history/group/{groupId}` | --- | `pageNumber` ,`pageSize` as query params | [{`messageId`, `sender`, `body`, `subject`, `time`} , ...] | returns `pageSize` number of `HistoryMessages` from reord multiple  of `pageNumber` and `pageSize` |
 | `DELETE` | `history/group/{groupId}` | [`messageId`, ...] | --- | --- | change status of saved message to deleted. |
+* Note: For channel just same group services but replace `group` word by `channel` word.
+
 
 ## eureka-server
 port number is `9090`
