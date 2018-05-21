@@ -1,9 +1,13 @@
 package com.jfms.aaa.service;
 
+import com.jfms.aaa.converter.UserConverter;
 import com.jfms.aaa.dal.entity.ActivationEntity;
+import com.jfms.aaa.dal.entity.UserEntity;
 import com.jfms.aaa.dal.repository.ActivationRepository;
+import com.jfms.aaa.dal.repository.UserRepository;
 import com.jfms.aaa.model.UserActivationRequest;
 import com.jfms.aaa.model.UserActivationResponse;
+import com.jfms.aaa.model.UserInfo;
 import com.jfms.aaa.service.biz.JWT;
 import com.jfms.aaa.service.biz.RandomGenerator;
 import com.jfms.aaa.service.biz.SMSService;
@@ -19,6 +23,10 @@ public class ActivationService {
     JWT jwt;
     @Autowired
     ActivationRepository activationRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    UserConverter userConverter;
     @Autowired
     RandomGenerator randomGenerator;
     @Autowired
@@ -36,7 +44,9 @@ public class ActivationService {
         );
         activationEntity.setUsed(true);
         activationRepository.save(activationEntity);
-        String jwtToken = jwt.createJWTToken(tokenTtl, null);
+        UserEntity userEntity = userRepository.findByMobileNumber(userActivationRequest.getMobileNumber());
+        UserInfo userInfo = userConverter.getInfo(userEntity);
+        String jwtToken = jwt.createJWTToken(tokenTtl, userInfo);
         return new UserActivationResponse(jwtToken);
     }
 

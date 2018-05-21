@@ -246,7 +246,7 @@ public class GroupChatManager implements InitializingBean{
         }
     }
 
-    //--------------- select for history
+    //---------------  history for group or channel
     private void historySaveGroupOrChannel(String owner, HistoryMessage groupHistoryMessage, boolean isChannel) {
         if (isChannel == true){
             messageHistoryApiFactory.getChannelApi().saveChannelHistoryMessage(owner, groupHistoryMessage);

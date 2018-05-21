@@ -2,6 +2,7 @@ package com.jfms.aaa.converter;
 
 
 import com.jfms.aaa.dal.entity.UserEntity;
+import com.jfms.aaa.model.UserInfo;
 import com.jfms.aaa.model.UserRegistrationRequest;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,14 @@ public class UserConverter {
                 userRegistrationRequest.getMobileNumber(),
                 userRegistrationRequest.getFirstName(),
                 userRegistrationRequest.getLastName()
+        );
+    }
+
+    public UserInfo getInfo(UserEntity userEntity){
+        return new UserInfo(
+                userEntity.getMobileNumber(),
+                userEntity.getFirstName(),
+                userEntity.getLastName()
         );
     }
 
